@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://pietenium.github.io/sitemap.xml

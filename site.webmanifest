@@ -1,0 +1,20 @@
+{
+  "name": "GLOBAL 120 — Corporate Intelligence Dashboard",
+  "short_name": "GLOBAL 120",
+  "description": "Interactive corporate intelligence and financial research dashboard by Pietenium.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/pietenium.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
