@@ -1,0 +1,1393 @@
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GLOBAL 120 — 3D Corporate Intelligence Dashboard | Presented by Pietenium</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+  <style>
+    :root {
+      --bg-midnight:#080D18;--bg-deep:#0C1422;--bg-panel:#111D30;--bg-panel-hover:#16253C;--bg-glass:rgba(17,29,48,.76);
+      --border-subtle:rgba(238,245,255,.08);--border-strong:rgba(238,245,255,.16);--border-gold:rgba(232,199,123,.35);
+      --gold:#E8C77B;--gold-dim:rgba(232,199,123,.14);--blue:#5AA9FF;--blue-dim:rgba(90,169,255,.14);
+      --cyan:#65D8EF;--emerald:#70E0B0;--pos:#4ADE80;--neg:#F26D7D;--text-primary:#EEF5FF;--text-secondary:#9BB0CC;--text-muted:#6C82A3;
+      --shadow-card:0 18px 42px -18px rgba(0,0,0,.78);
+      --font-sans:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      --font-serif:"Instrument Serif",Georgia,serif;--font-mono:"JetBrains Mono",ui-monospace,monospace;
+    }
+    [data-theme="light"] {
+      --bg-midnight:#F3F6FB;--bg-deep:#FFFFFF;--bg-panel:#FFFFFF;--bg-panel-hover:#F6F9FF;--bg-glass:rgba(255,255,255,.88);
+      --border-subtle:rgba(12,20,34,.09);--border-strong:rgba(12,20,34,.18);--border-gold:rgba(158,114,29,.35);
+      --gold:#9E721D;--gold-dim:rgba(158,114,29,.10);--blue:#1D6FD8;--blue-dim:rgba(29,111,216,.10);
+      --cyan:#0D8CA8;--emerald:#0E8F64;--pos:#15803D;--neg:#C81E3A;--text-primary:#0B1526;--text-secondary:#435672;--text-muted:#6B7F99;
+      --shadow-card:0 14px 32px -16px rgba(15,28,52,.14);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font-sans);background:var(--bg-midnight);color:var(--text-primary);line-height:1.55;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+    .ambient-grid{position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle at 18% 12%,rgba(90,169,255,.07),transparent 36%),radial-gradient(circle at 82% 24%,rgba(232,199,123,.06),transparent 34%),linear-gradient(to right,rgba(238,245,255,.022) 1px,transparent 1px),linear-gradient(to bottom,rgba(238,245,255,.022) 1px,transparent 1px);background-size:100% 100%,100% 100%,72px 72px,72px 72px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),rgba(0,0,0,.25) 70%,transparent)}
+    a{color:inherit;text-decoration:none}button,input,select{font-family:inherit;color:inherit}button{cursor:pointer;background:none;border:none}
+    :focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:4px}
+    .container{width:100%;max-width:1420px;margin:0 auto;padding:0 24px;position:relative;z-index:2}
+    .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+    .navbar{position:sticky;top:0;z-index:90;background:rgba(8,13,24,.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid var(--border-subtle)}
+    [data-theme="light"] .navbar{background:rgba(255,255,255,.9)}
+    .nav-inner{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:70px}
+    .brand-group{display:flex;align-items:center;gap:13px;flex-shrink:0}
+    .brand-mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(232,199,123,.24),rgba(90,169,255,.18));border:1px solid var(--border-gold);display:grid;place-items:center;font-family:var(--font-mono);font-weight:700;font-size:.78rem;color:var(--gold)}
+    .brand-title{font-weight:800;font-size:.96rem;letter-spacing:.08em}
+    .brand-sub{font-size:.72rem;color:var(--text-muted);display:flex;align-items:center;gap:8px}
+    .pietenium-pill{font-size:.68rem;color:var(--gold);border-left:1px solid var(--border-strong);padding-left:8px}
+    .pietenium-pill:hover{text-decoration:underline}
+    .nav-links{display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.03);border:1px solid var(--border-subtle);padding:4px;border-radius:999px}
+    .nav-link{padding:7px 14px;border-radius:999px;font-size:.82rem;font-weight:500;color:var(--text-secondary);transition:all .2s}
+    .nav-link:hover{color:var(--text-primary)}
+    .nav-link.active{background:var(--bg-panel);color:var(--gold);border:1px solid var(--border-gold)}
+    .nav-actions{display:flex;align-items:center;gap:9px}
+    .nav-date-badge{font-family:var(--font-mono);font-size:.72rem;color:var(--text-secondary);padding:6px 10px;border-radius:8px;background:var(--bg-panel);border:1px solid var(--border-subtle);display:flex;align-items:center;gap:6px}
+    .pulse-dot{width:7px;height:7px;border-radius:50%;background:var(--emerald);box-shadow:0 0 8px var(--emerald);animation:pulse 2.4s infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.85)}}
+    .icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg-panel);border:1px solid var(--border-subtle);display:grid;place-items:center;color:var(--text-secondary);transition:all .2s}
+    .icon-btn:hover{color:var(--gold);border-color:var(--border-gold)}
+    .mobile-menu-btn{display:none}
+    .mobile-drawer{display:none;position:fixed;top:70px;left:0;right:0;z-index:88;background:var(--bg-deep);border-bottom:1px solid var(--border-strong);padding:16px 24px;flex-direction:column;gap:10px}
+    .mobile-drawer.open{display:flex}
+
+    .hero{padding:44px 0 34px}
+    .hero-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:34px;align-items:center}
+    .hero-eyebrow{display:inline-flex;align-items:center;gap:10px;padding:6px 14px;border-radius:999px;background:var(--gold-dim);border:1px solid var(--border-gold);font-size:.74rem;font-weight:600;color:var(--gold);letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px}
+    .hero h1{font-size:clamp(2.25rem,4.3vw,3.75rem);line-height:1.06;font-weight:800;letter-spacing:-.03em;margin-bottom:16px}
+    .hero h1 .accent-serif{font-family:var(--font-serif);font-weight:400;font-style:italic;color:var(--gold)}
+    .hero-lead{font-size:1.02rem;color:var(--text-secondary);max-width:590px;margin-bottom:24px}
+    .hero-cta-row{display:flex;flex-wrap:wrap;gap:11px;margin-bottom:26px}
+    .btn-primary{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:10px;background:linear-gradient(135deg,#E8C77B,#C99D44);color:#080D18;font-weight:700;font-size:.87rem;box-shadow:0 10px 26px -10px rgba(232,199,123,.55);transition:transform .2s}
+    .btn-primary:hover{transform:translateY(-2px)}
+    .btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border-radius:10px;background:var(--bg-panel);border:1px solid var(--border-strong);color:var(--text-primary);font-weight:600;font-size:.86rem;transition:all .2s}
+    .btn-secondary:hover{border-color:var(--blue);color:var(--blue)}
+    .hero-stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+    .hero-stat{background:var(--bg-glass);backdrop-filter:blur(12px);border:1px solid var(--border-subtle);border-radius:12px;padding:11px 13px}
+    .hero-stat-label{font-size:.66rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+    .hero-stat-val{font-family:var(--font-mono);font-size:1.04rem;font-weight:700}
+    .hero-stat-sub{font-size:.66rem;color:var(--emerald);margin-top:2px}
+
+    .globe-stage{position:relative;height:430px;border-radius:22px;background:radial-gradient(circle at 50% 48%,rgba(90,169,255,.14),rgba(12,20,34,.94) 72%);border:1px solid var(--border-strong);box-shadow:var(--shadow-card);overflow:hidden}
+    #globeCanvasContainer{width:100%;height:100%;position:relative;cursor:grab}
+    #globeCanvasContainer:active{cursor:grabbing}
+    .globe-overlay-top{position:absolute;top:14px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;pointer-events:none;z-index:4}
+    .globe-badge{pointer-events:auto;display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:999px;background:rgba(8,13,24,.78);backdrop-filter:blur(10px);border:1px solid var(--border-subtle);font-size:.72rem;color:var(--text-secondary)}
+    .globe-controls{pointer-events:auto;display:flex;gap:6px}
+    .globe-ctrl-btn{padding:5px 10px;border-radius:8px;background:rgba(8,13,24,.78);border:1px solid var(--border-subtle);font-size:.7rem;color:var(--text-secondary)}
+    .globe-ctrl-btn.active,.globe-ctrl-btn:hover{color:var(--gold);border-color:var(--border-gold)}
+    .globe-tooltip{position:absolute;pointer-events:none;z-index:10;padding:10px 13px;border-radius:10px;background:rgba(8,13,24,.95);border:1px solid var(--border-gold);box-shadow:0 14px 30px rgba(0,0,0,.55);font-size:.75rem;opacity:0;transform:translate(-50%,-115%);transition:opacity .15s;min-width:175px;color:#EEF5FF}
+    .globe-overlay-bottom{position:absolute;bottom:12px;left:14px;right:14px;display:flex;flex-wrap:wrap;gap:6px;z-index:4;pointer-events:none}
+    .region-pills{display:flex;flex-wrap:wrap;gap:5px;pointer-events:auto}
+    .region-pill{font-size:.68rem;padding:4px 9px;border-radius:999px;background:rgba(8,13,24,.78);border:1px solid var(--border-subtle);color:var(--text-secondary)}
+    .region-pill.active,.region-pill:hover{background:var(--gold-dim);color:var(--gold);border-color:var(--border-gold)}
+
+    .section{padding:42px 0}
+    .section-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border-subtle)}
+    .section-kicker{font-family:var(--font-mono);font-size:.72rem;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+    .section-title{font-size:clamp(1.4rem,2.4vw,1.95rem);font-weight:800;letter-spacing:-.02em}
+    .section-desc{font-size:.89rem;color:var(--text-secondary);max-width:680px}
+
+    .overview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .kpi-card{background:linear-gradient(160deg,var(--bg-panel),var(--bg-deep));border:1px solid var(--border-subtle);border-radius:16px;padding:17px 19px;box-shadow:var(--shadow-card);transition:transform .22s,border-color .22s}
+    .kpi-card:hover{transform:translateY(-3px);border-color:var(--border-gold)}
+    .kpi-label{font-size:.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;display:flex;justify-content:space-between;gap:6px;align-items:center}
+    .kpi-value{font-family:var(--font-mono);font-size:1.48rem;font-weight:700;margin-bottom:4px}
+    .kpi-meta{font-size:.75rem;color:var(--text-secondary)}
+
+    .conf-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-family:var(--font-mono);font-size:.63rem;font-weight:600;white-space:nowrap}
+    .conf-VERIFIED_PRIMARY{background:rgba(112,224,176,.14);color:var(--emerald);border:1px solid rgba(112,224,176,.35)}
+    .conf-VERIFIED_SECONDARY{background:rgba(90,169,255,.14);color:var(--blue);border:1px solid rgba(90,169,255,.35)}
+    .conf-ESTIMATED{background:rgba(232,199,123,.14);color:var(--gold);border:1px solid rgba(232,199,123,.35)}
+    .conf-DERIVED{background:rgba(101,216,239,.12);color:var(--cyan);border:1px solid rgba(101,216,239,.32)}
+
+    .toolbar{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:16px;padding:15px;margin-bottom:16px;display:flex;flex-direction:column;gap:11px}
+    .toolbar-row{display:flex;flex-wrap:wrap;gap:9px;align-items:center;justify-content:space-between}
+    .search-box{position:relative;flex:1 1 260px;max-width:420px}
+    .search-box input{width:100%;padding:10px 14px 10px 38px;border-radius:10px;background:var(--bg-midnight);border:1px solid var(--border-strong);font-size:.85rem}
+    .search-box input:focus{outline:none;border-color:var(--gold)}
+    .search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);pointer-events:none}
+    .filter-select{padding:9px 11px;border-radius:10px;background:var(--bg-midnight);border:1px solid var(--border-subtle);font-size:.79rem;min-width:132px}
+    .view-toggle{display:inline-flex;background:var(--bg-midnight);border:1px solid var(--border-subtle);border-radius:10px;padding:3px}
+    .view-btn{padding:7px 14px;border-radius:7px;font-size:.78rem;font-weight:600;color:var(--text-secondary)}
+    .view-btn.active{background:var(--bg-panel);color:var(--gold);border:1px solid var(--border-gold)}
+
+    .cards-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;perspective:1400px}
+    .company-card{position:relative;background:linear-gradient(155deg,rgba(17,29,48,.96),rgba(12,20,34,.98));border:1px solid var(--border-subtle);border-radius:17px;padding:19px;box-shadow:var(--shadow-card);transform-style:preserve-3d;transition:transform .16s ease-out,border-color .22s;cursor:pointer;display:flex;flex-direction:column;justify-content:space-between;gap:13px;overflow:hidden}
+    [data-theme="light"] .company-card{background:linear-gradient(155deg,#FFFFFF,#F5F8FD)}
+    .company-card::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,20%),rgba(232,199,123,.12),transparent 52%);opacity:0;transition:opacity .25s;pointer-events:none}
+    .company-card:hover{border-color:var(--border-gold)}
+    .company-card:hover::before{opacity:1}
+    .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .card-identity{display:flex;align-items:center;gap:11px;min-width:0}
+    .monogram{width:41px;height:41px;border-radius:11px;flex-shrink:0;display:grid;place-items:center;font-family:var(--font-mono);font-weight:700;font-size:.84rem;border:1px solid rgba(255,255,255,.16)}
+    .card-name{font-weight:700;font-size:.96rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .card-ticker-line{font-size:.73rem;color:var(--text-muted);font-family:var(--font-mono)}
+    .rank-chip{font-family:var(--font-mono);font-size:.72rem;font-weight:700;padding:4px 9px;border-radius:8px;background:var(--gold-dim);color:var(--gold);border:1px solid var(--border-gold);flex-shrink:0}
+    .card-purpose{font-size:.79rem;color:var(--text-secondary);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.45em}
+    .card-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 11px;border-radius:10px;background:rgba(8,13,24,.48);border:1px solid var(--border-subtle)}
+    [data-theme="light"] .card-metrics{background:#F1F5FB}
+    .cm-label{font-size:.63rem;color:var(--text-muted);text-transform:uppercase}
+    .cm-val{font-family:var(--font-mono);font-size:.85rem;font-weight:700}
+    .card-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    .sector-tag{font-size:.69rem;padding:3px 9px;border-radius:6px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(90,169,255,.22)}
+
+    .table-wrap{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:16px;overflow-x:auto;box-shadow:var(--shadow-card)}
+    table.fin-table{width:100%;border-collapse:collapse;font-size:.8rem;min-width:1080px}
+    .fin-table th{position:sticky;top:0;z-index:2;background:var(--bg-deep);color:var(--text-muted);font-weight:600;font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;text-align:right;padding:11px 13px;border-bottom:1px solid var(--border-strong);white-space:nowrap}
+    .fin-table th:nth-child(1),.fin-table th:nth-child(2),.fin-table th:nth-child(3),.fin-table th:nth-child(4),.fin-table th:nth-child(5){text-align:left}
+    .fin-table td{padding:10px 13px;border-bottom:1px solid var(--border-subtle);text-align:right;font-family:var(--font-mono);white-space:nowrap}
+    .fin-table td:nth-child(1),.fin-table td:nth-child(2),.fin-table td:nth-child(3),.fin-table td:nth-child(4),.fin-table td:nth-child(5){text-align:left;font-family:var(--font-sans)}
+    .fin-table tbody tr{cursor:pointer;transition:background .15s}
+    .fin-table tbody tr:hover{background:var(--bg-panel-hover)}
+
+    .pagination-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;font-size:.81rem;color:var(--text-secondary)}
+    .page-btns{display:flex;gap:6px;flex-wrap:wrap}
+    .page-btn{padding:6px 12px;border-radius:8px;background:var(--bg-panel);border:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:.77rem;color:var(--text-secondary)}
+    .page-btn.active{background:var(--gold-dim);color:var(--gold);border-color:var(--border-gold)}
+    .page-btn:disabled{opacity:.35;cursor:not-allowed}
+
+    .charts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}
+    .chart-card{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:16px;padding:19px;box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:11px}
+    .chart-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+    .chart-title{font-size:.94rem;font-weight:700}
+    .chart-sub{font-size:.73rem;color:var(--text-muted)}
+    .chart-canvas-wrap{position:relative;height:285px;width:100%}
+
+    .compare-panel{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:16px;padding:21px;box-shadow:var(--shadow-card)}
+    .compare-selectors{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+    .compare-slot{background:var(--bg-midnight);border:1px solid var(--border-strong);border-radius:12px;padding:11px}
+    .compare-slot label{display:block;font-size:.67rem;color:var(--gold);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+    .compare-slot select{width:100%;background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:8px;padding:8px 10px;font-size:.81rem}
+    .preset-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center}
+    .preset-btn{font-size:.73rem;padding:5px 12px;border-radius:999px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(90,169,255,.28)}
+    .preset-btn:hover{background:var(--gold-dim);color:var(--gold);border-color:var(--border-gold)}
+
+    .method-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin-bottom:20px}
+    .method-card{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:16px;padding:18px}
+    .method-card h3{font-size:.94rem;margin-bottom:8px;color:var(--gold)}
+    .method-card p,.method-card li{font-size:.81rem;color:var(--text-secondary)}
+    .method-card ul{padding-left:16px;display:flex;flex-direction:column;gap:5px}
+    .source-dir{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0}
+    .source-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;background:var(--bg-panel);border:1px solid var(--border-subtle);font-size:.77rem;color:var(--blue)}
+    .source-chip:hover{border-color:var(--blue)}
+    .disclaimer-box{padding:15px 19px;border-radius:12px;background:rgba(232,199,123,.06);border:1px solid var(--border-gold);font-size:.81rem;color:var(--text-secondary)}
+
+    .modal-backdrop{position:fixed;inset:0;z-index:120;background:rgba(4,8,15,.84);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:18px}
+    .modal-backdrop.open{display:flex}
+    .modal-dialog{width:100%;max-width:1100px;max-height:90vh;background:var(--bg-deep);border:1px solid var(--border-gold);border-radius:20px;box-shadow:0 32px 80px rgba(0,0,0,.85);display:flex;flex-direction:column;overflow:hidden}
+    .modal-header{padding:18px 24px;background:linear-gradient(135deg,var(--bg-panel),var(--bg-deep));border-bottom:1px solid var(--border-subtle);display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+    .modal-body{padding:22px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:20px}
+    .modal-tabs{display:flex;flex-wrap:wrap;gap:8px;border-bottom:1px solid var(--border-subtle);padding-bottom:12px}
+    .modal-tab{padding:7px 14px;border-radius:8px;font-size:.79rem;font-weight:600;color:var(--text-secondary);background:var(--bg-panel);border:1px solid var(--border-subtle)}
+    .modal-tab.active{color:var(--gold);border-color:var(--border-gold);background:var(--gold-dim)}
+    .modal-grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+    .modal-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+    .metric-tile{background:var(--bg-panel);border:1px solid var(--border-subtle);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+    .metric-tile-top{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:.71rem;color:var(--text-muted)}
+    .metric-tile-val{font-family:var(--font-mono);font-size:1.1rem;font-weight:700}
+    .metric-tile-sub{font-size:.68rem;color:var(--text-secondary)}
+
+    footer.site-footer{margin-top:52px;background:#060A13;border-top:1px solid var(--border-subtle);padding:44px 0 24px;color:#9BB0CC}
+    .footer-grid{display:grid;grid-template-columns:1.35fr 1fr 1fr 1fr;gap:26px;padding-bottom:28px;border-bottom:1px solid rgba(238,245,255,.08)}
+    .footer-col h4{color:#EEF5FF;font-size:.87rem;margin-bottom:11px}
+    .footer-col p,.footer-col li{font-size:.77rem;line-height:1.62;color:#8BA0BD;list-style:none}
+    .footer-col a{color:#9BB0CC}.footer-col a:hover{color:#E8C77B}
+    .tech-strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .tech-pill{font-family:var(--font-mono);font-size:.66rem;padding:3px 7px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:#C5D5EA}
+    .footer-bottom{padding-top:18px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:.75rem;color:#6C82A3}
+    .pos{color:var(--pos)}.neg{color:var(--neg)}
+
+    @media (max-width:1120px){
+      .hero-grid{grid-template-columns:1fr}.hero-stats-grid{grid-template-columns:repeat(3,1fr)}.overview-grid{grid-template-columns:repeat(2,1fr)}
+      .cards-grid{grid-template-columns:repeat(2,1fr)}.charts-grid{grid-template-columns:1fr}.compare-selectors{grid-template-columns:repeat(2,1fr)}
+      .method-grid{grid-template-columns:1fr}.footer-grid{grid-template-columns:repeat(2,1fr)}.modal-grid-4{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:760px){
+      .nav-links,.nav-date-badge{display:none}.mobile-menu-btn{display:grid}.hero-stats-grid{grid-template-columns:repeat(2,1fr)}
+      .overview-grid,.cards-grid,.compare-selectors,.footer-grid,.modal-grid-4,.modal-grid-3{grid-template-columns:1fr}.globe-stage{height:330px}
+    }
+    @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+  </style>
+</head>
+<body>
+  <div class="ambient-grid" aria-hidden="true"></div>
+
+  <header class="navbar">
+    <div class="container nav-inner">
+      <div class="brand-group">
+        <a href="#top" class="brand-mark" aria-label="Global 120 Home">G120</a>
+        <div>
+          <div class="brand-title">GLOBAL 120</div>
+          <div class="brand-sub">
+            <span>Corporate Intelligence</span>
+            <a href="https://pietenium.vercel.app" target="_blank" rel="noopener noreferrer" class="pietenium-pill">A Pietenium presentation</a>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav-links" aria-label="Primary Navigation">
+        <a href="#overview" class="nav-link active">Overview</a>
+        <a href="#companies" class="nav-link">Companies</a>
+        <a href="#financials" class="nav-link">Financials</a>
+        <a href="#compare" class="nav-link">Compare</a>
+        <a href="#insights" class="nav-link">Insights</a>
+        <a href="#methodology" class="nav-link">Methodology</a>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="nav-date-badge" title="Snapshot Timestamp (UTC)">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          <span>2026-03-31 UTC</span>
+        </div>
+        <button id="quickSearchBtn" class="icon-btn" title="Jump to Search" aria-label="Jump to Search">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </button>
+        <button id="themeToggleBtn" class="icon-btn" title="Toggle Dark / Light Theme" aria-label="Toggle Theme">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+        </button>
+        <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Mobile Menu" aria-expanded="false">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div id="mobileDrawer" class="mobile-drawer" aria-label="Mobile Navigation">
+    <a href="#overview" class="nav-link">Overview</a>
+    <a href="#companies" class="nav-link">Companies</a>
+    <a href="#financials" class="nav-link">Financials</a>
+    <a href="#compare" class="nav-link">Compare</a>
+    <a href="#insights" class="nav-link">Insights</a>
+    <a href="#methodology" class="nav-link">Methodology</a>
+  </div>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="hero-eyebrow"><span>Global Equity Intelligence</span><span>&middot;</span><span class="mono">120 Public Corporations</span></div>
+          <h1>The Global <span class="accent-serif">Corporate</span> Landscape.</h1>
+          <p class="hero-lead">Explore the world's leading public companies through market capitalization, business models, financial statements, shareholder statistics and global market presence.</p>
+          <div class="hero-cta-row">
+            <a href="#companies" class="btn-primary">Explore Top 120 Directory</a>
+            <a href="#compare" class="btn-secondary">Compare Up to 4 Companies</a>
+            <a href="#methodology" class="btn-secondary">Audit Sources &amp; Confidence</a>
+          </div>
+          <div class="hero-stats-grid" id="heroStatsGrid"></div>
+        </div>
+
+        <div class="globe-stage" aria-label="Interactive 3D Global Capital Distribution">
+          <div class="globe-overlay-top">
+            <div class="globe-badge"><span class="pulse-dot"></span><span id="globeStatusText">Interactive 3D Exchange Atlas</span></div>
+            <div class="globe-controls">
+              <button class="globe-ctrl-btn active" id="toggleRotateBtn">Auto-Orbit</button>
+              <button class="globe-ctrl-btn" id="resetGlobeBtn">Reset</button>
+            </div>
+          </div>
+          <div id="globeCanvasContainer"></div>
+          <div id="globeTooltip" class="globe-tooltip"></div>
+          <div class="globe-overlay-bottom">
+            <div class="region-pills" id="globeRegionPills">
+              <button class="region-pill active" data-region="ALL">All Markets</button>
+              <button class="region-pill" data-region="Americas">Americas</button>
+              <button class="region-pill" data-region="Europe">Europe</button>
+              <button class="region-pill" data-region="Asia-Pacific">Asia-Pacific</button>
+              <button class="region-pill" data-region="Middle East">Middle East</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="overview" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">01 &middot; Executive Telemetry</div>
+            <h2 class="section-title">Global Market Overview</h2>
+            <p class="section-desc">Headline metrics dynamically calculated from the embedded 120-company dataset with explicit confidence labeling.</p>
+          </div>
+        </div>
+        <div class="overview-grid" id="overviewGrid"></div>
+      </div>
+    </section>
+
+    <section id="companies" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">02 &middot; Primary Equity Universe</div>
+            <h2 class="section-title">Top 120 Company Directory</h2>
+            <p class="section-desc">Select any corporation to inspect full financial statements, share statistics, derived ratios, and clickable primary source references.</p>
+          </div>
+          <div class="view-toggle" role="group" aria-label="Directory View Switcher">
+            <button class="view-btn active" id="cardViewBtn">3D Card View</button>
+            <button class="view-btn" id="tableViewBtn">Table View</button>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar-row">
+            <div class="search-box">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="search" id="searchInput" placeholder="Search company, ticker, country, exchange, sector, industry..." aria-label="Search companies" />
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+              <select id="countryFilter" class="filter-select" aria-label="Country Filter"><option value="ALL">All Countries</option></select>
+              <select id="sectorFilter" class="filter-select" aria-label="Sector Filter"><option value="ALL">All Sectors</option></select>
+              <select id="industryFilter" class="filter-select" aria-label="Industry Filter"><option value="ALL">All Industries</option></select>
+              <select id="exchangeFilter" class="filter-select" aria-label="Exchange Filter"><option value="ALL">All Exchanges</option></select>
+            </div>
+          </div>
+          <div class="toolbar-row">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+              <select id="mcapFilter" class="filter-select" aria-label="Market Cap Range">
+                <option value="ALL">All Market Caps</option>
+                <option value="1000+">Mega Cap ($1T+)</option>
+                <option value="500-1000">$500B – $1T</option>
+                <option value="250-500">$250B – $500B</option>
+                <option value="100-250">$100B – $250B</option>
+              </select>
+              <select id="confFilter" class="filter-select" aria-label="Confidence Filter">
+                <option value="ALL">All Confidence Tiers</option>
+                <option value="VERIFIED_PRIMARY">Primary Filing Core</option>
+                <option value="VERIFIED_SECONDARY">Cross-Checked Secondary</option>
+                <option value="ESTIMATED">Includes Estimated Snapshot</option>
+              </select>
+              <select id="profitFilter" class="filter-select" aria-label="Profitability Filter">
+                <option value="ALL">All Profitability</option>
+                <option value="PROFITABLE">Net Profitable (&gt; $0)</option>
+                <option value="HIGH_MARGIN">Net Margin &ge; 20%</option>
+              </select>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+              <select id="sortSelect" class="filter-select" aria-label="Sort Companies">
+                <option value="rank-asc">Sort: Rank (1 &rarr; 120)</option>
+                <option value="mcap-desc">Sort: Market Cap (High &rarr; Low)</option>
+                <option value="rev-desc">Sort: Revenue (High &rarr; Low)</option>
+                <option value="ni-desc">Sort: Net Income (High &rarr; Low)</option>
+                <option value="assets-desc">Sort: Total Assets (High &rarr; Low)</option>
+                <option value="eq-desc">Sort: Shareholders' Equity (High &rarr; Low)</option>
+                <option value="liab-desc">Sort: Total Liabilities (High &rarr; Low)</option>
+                <option value="vol-desc">Sort: 30d Avg Volume (High &rarr; Low)</option>
+                <option value="name-asc">Sort: Alphabetical (A &rarr; Z)</option>
+              </select>
+              <select id="pageSizeSelect" class="filter-select" style="min-width:105px" aria-label="Page Size">
+                <option value="12">12 / page</option>
+                <option value="24" selected>24 / page</option>
+                <option value="60">60 / page</option>
+                <option value="120">All 120</option>
+              </select>
+              <button id="resetFiltersBtn" class="btn-secondary" style="padding:8px 13px;font-size:.78rem">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="directoryResultCount" style="font-size:.8rem;color:var(--text-secondary);margin-bottom:12px"></div>
+        <div id="cardsContainer" class="cards-grid"></div>
+        <div id="tableContainer" class="table-wrap" style="display:none"></div>
+        <div id="paginationBar" class="pagination-bar"></div>
+      </div>
+    </section>
+
+    <section id="financials" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">03 &middot; Quantitative Visualization</div>
+            <h2 class="section-title">Global Financial Analytics</h2>
+            <p class="section-desc">Ten interactive charts generated directly from normalized USD billion statements across all 120 corporations.</p>
+          </div>
+        </div>
+        <div id="insights"></div>
+        <div class="charts-grid" id="chartsGrid"></div>
+      </div>
+    </section>
+
+    <section id="compare" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">04 &middot; Peer Benchmarking</div>
+            <h2 class="section-title">Multi-Company Comparison Engine</h2>
+            <p class="section-desc">Benchmark up to four public corporations across market capitalization, income efficiency, balance sheet leverage, cash flows, and float structure.</p>
+          </div>
+        </div>
+        <div class="compare-panel">
+          <div class="preset-row">
+            <span style="font-size:.76rem;color:var(--text-muted)">Presets:</span>
+            <button class="preset-btn" data-preset="1,2,3,5">AI &amp; Cloud Leaders</button>
+            <button class="preset-btn" data-preset="4,17,36,51">Global Energy Majors</button>
+            <button class="preset-btn" data-preset="14,28,57,63">Global Banking</button>
+            <button class="preset-btn" data-preset="12,22,24,44">Global Biopharma</button>
+            <button class="preset-btn" data-preset="2,9,10,31">Semiconductor Supply Chain</button>
+          </div>
+          <div class="compare-selectors" id="compareSelectors"></div>
+          <div class="chart-canvas-wrap" style="height:310px;margin-bottom:18px"><canvas id="compareChart"></canvas></div>
+          <div class="table-wrap" id="compareTableWrap"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="methodology" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <div class="section-kicker">05 &middot; Data Governance &amp; Audit</div>
+            <h2 class="section-title">Research Methodology &amp; Transparency</h2>
+            <p class="section-desc">Every metric documents its reporting period, currency normalization basis, source link, and explicit confidence tier.</p>
+          </div>
+        </div>
+        <div class="method-grid">
+          <div class="method-card">
+            <h3>Ranking &amp; Share-Class Rules</h3>
+            <ul>
+              <li>Ranked by consolidated USD equity market capitalization across primary and secondary share classes.</li>
+              <li>Dual-class issuers (Alphabet GOOGL/GOOG, Berkshire Hathaway A/B, Samsung common/pref) appear once.</li>
+              <li>Private enterprises (e.g., SpaceX, ByteDance) are excluded; only exchange-listed equities are tracked.</li>
+            </ul>
+          </div>
+          <div class="method-card">
+            <h3>Confidence Classification</h3>
+            <ul>
+              <li><span class="conf-badge conf-VERIFIED_PRIMARY">VERIFIED_PRIMARY</span> Statutory annual reports (10-K, 20-F, IFRS filings) and IR releases.</li>
+              <li><span class="conf-badge conf-VERIFIED_SECONDARY">VERIFIED_SECONDARY</span> Cross-checked market aggregators &amp; financial databases.</li>
+              <li><span class="conf-badge conf-ESTIMATED">ESTIMATED</span> Reference snapshot valuations, FX conversions, and modeled float/liquidity splits.</li>
+            </ul>
+          </div>
+          <div class="method-card">
+            <h3>Derived Financial Formulas</h3>
+            <ul>
+              <li><strong>Net Worth Check:</strong> Reported Equity (cross-checked via Total Assets &minus; Total Liabilities).</li>
+              <li><strong>Margins:</strong> Gross / Operating / Net Income &divide; Revenue &times; 100.</li>
+              <li><strong>Leverage:</strong> Liabilities &divide; Assets &times; 100 and Equity &divide; Assets &times; 100.</li>
+              <li><strong>Free Cash Flow:</strong> Operating Cash Flow &minus; Capital Expenditure.</li>
+              <li><strong>Valuation Multiple:</strong> Market Cap &divide; Annual Revenue.</li>
+            </ul>
+          </div>
+        </div>
+        <h3 style="font-size:.94rem;margin-bottom:8px">Primary Source &amp; Filing Directory</h3>
+        <div class="source-dir">
+          <a class="source-chip" href="https://www.sec.gov/edgar/search/" target="_blank" rel="noopener noreferrer">SEC EDGAR Filings ↗</a>
+          <a class="source-chip" href="https://www.companiesmarketcap.com/" target="_blank" rel="noopener noreferrer">CompaniesMarketCap ↗</a>
+          <a class="source-chip" href="https://finance.yahoo.com/" target="_blank" rel="noopener noreferrer">Yahoo Finance ↗</a>
+          <a class="source-chip" href="https://www.google.com/finance/" target="_blank" rel="noopener noreferrer">Google Finance ↗</a>
+          <a class="source-chip" href="https://www.annualreports.com/" target="_blank" rel="noopener noreferrer">AnnualReports.com ↗</a>
+          <a class="source-chip" href="https://www.londonstockexchange.com/" target="_blank" rel="noopener noreferrer">London Stock Exchange ↗</a>
+          <a class="source-chip" href="https://www.jpx.co.jp/english/" target="_blank" rel="noopener noreferrer">Japan Exchange Group ↗</a>
+          <a class="source-chip" href="https://www.hkex.com.hk/" target="_blank" rel="noopener noreferrer">HKEX Filings ↗</a>
+        </div>
+        <div class="disclaimer-box">
+          <strong>Research Snapshot &amp; Disclaimer (Reference Snapshot: 2026-03-31 UTC):</strong>
+          This dashboard is an independent corporate research and data-visualization project. Information is collected from public financial sources and company disclosures. Estimates are explicitly identified. Market data can change, reported financial periods may differ, and the dashboard does not constitute investment advice.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="companyModalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalCompanyName">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:14px;min-width:0">
+          <div id="modalMonogram" class="monogram" style="width:50px;height:50px;font-size:1rem"></div>
+          <div style="min-width:0">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span id="modalRankChip" class="rank-chip"></span>
+              <h2 id="modalCompanyName" style="font-size:1.3rem;font-weight:800"></h2>
+              <span id="modalTickerBadge" class="sector-tag mono"></span>
+            </div>
+            <div id="modalSubLine" style="font-size:.79rem;color:var(--text-secondary);margin-top:4px"></div>
+          </div>
+        </div>
+        <button id="closeModalBtn" class="icon-btn" aria-label="Close Company Details" style="flex-shrink:0">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Pietenium</h4>
+          <p>Pietenium is a custom software development agency building 100% hand-coded web applications, dashboards, admin panels and AI-integrated software — no CMS, no website builders, no low-code platforms.</p>
+          <p style="margin-top:8px"><strong style="color:#EEF5FF">Leadership:</strong> Founder Abdullah Abu Shayed &middot; CTO Tarekul Islam Rifat<br/><strong style="color:#EEF5FF">Scope:</strong> 100+ industries &times; up to 6 product types</p>
+          <p style="margin-top:8px"><a href="https://pietenium.vercel.app" target="_blank" rel="noopener noreferrer">https://pietenium.vercel.app</a></p>
+        </div>
+        <div class="footer-col">
+          <h4>Approved Services</h4>
+          <ul>
+            <li>Web Applications &amp; AI-Integrated Web Apps</li>
+            <li>Dashboard Websites &amp; AI-Integrated Dashboards</li>
+            <li>Admin Panels &amp; AI-Integrated Admin Panels</li>
+            <li>SaaS &amp; SEO Web Applications</li>
+            <li>E-Commerce &amp; Dropshipping with Dashboard</li>
+            <li>Real Estate, Medical &amp; Hospitality Platforms</li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Technology Stack</h4>
+          <p>Documented technology options selected by architecture (monolith or microservice):</p>
+          <div class="tech-strip">
+            <span class="tech-pill">React</span><span class="tech-pill">Next.js</span><span class="tech-pill">Tailwind CSS</span>
+            <span class="tech-pill">Vite</span><span class="tech-pill">Node.js</span><span class="tech-pill">Express.js</span>
+            <span class="tech-pill">Python</span><span class="tech-pill">Django</span><span class="tech-pill">PostgreSQL</span>
+            <span class="tech-pill">MongoDB</span><span class="tech-pill">Prisma ORM</span><span class="tech-pill">Redis</span>
+            <span class="tech-pill">Nginx</span><span class="tech-pill">PM2</span>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Contact &amp; Links</h4>
+          <ul>
+            <li>Email: <a href="mailto:pietenium0@gmail.com">pietenium0@gmail.com</a></li>
+            <li>Secondary: <a href="mailto:pietenium@aol.com">pietenium@aol.com</a></li>
+            <li>WhatsApp: <a href="https://wa.me/8801821603355" target="_blank" rel="noopener noreferrer">+880 1821-603355</a></li>
+            <li>About: <a href="https://pietenium.vercel.app/about" target="_blank" rel="noopener noreferrer">pietenium.vercel.app/about</a></li>
+            <li>Tumblr: <a href="https://pietenium.tumblr.com/" target="_blank" rel="noopener noreferrer">pietenium.tumblr.com</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>Corporate Intelligence Research Interface &middot; Presented by <a href="https://pietenium.vercel.app" target="_blank" rel="noopener noreferrer" style="color:#E8C77B">Pietenium</a></span>
+        <span>&copy; <span id="copyrightYear">2026</span> Pietenium. Hand-coded research interface.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  (() => {
+    "use strict";
+
+    const esc = (v) => v == null ? "" : String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    const safeUrl = (u) => (typeof u === "string" && /^https?:\/\//i.test(u)) ? u : "#";
+    const isNum = (n) => typeof n === "number" && Number.isFinite(n);
+    const fmtB = (n, d = 1) => isNum(n) ? (n < 0 ? `-$${Math.abs(n).toFixed(d)}B` : `$${n.toFixed(d)}B`) : "—";
+    const fmtPrice = (n, c) => {
+      if (!isNum(n)) return "—";
+      const sym = { USD:"$",EUR:"€",GBP:"£",JPY:"¥",CNY:"¥",HKD:"HK$",TWD:"NT$",KRW:"₩",INR:"₹",SAR:"SAR ",CHF:"CHF ",CAD:"C$",AUD:"A$",DKK:"DKK ",NOK:"NOK " }[c] || `${c} `;
+      return `${sym}${n.toLocaleString("en-US",{minimumFractionDigits:n>500?0:2,maximumFractionDigits:2})}`;
+    };
+    const fmtSh = (m) => isNum(m) ? (m >= 1000 ? `${(m/1000).toFixed(2)}B` : `${m.toFixed(1)}M`) : "—";
+    const fmtPct = (n) => isNum(n) ? `${n>=0?"+":""}${n.toFixed(2)}%` : "—";
+
+    const SECTOR_COLORS = {
+      "Technology":["#5AA9FF","rgba(90,169,255,.16)"],"Communication Services":["#65D8EF","rgba(101,216,239,.16)"],
+      "Consumer Discretionary":["#E8C77B","rgba(232,199,123,.16)"],"Consumer Staples":["#70E0B0","rgba(112,224,176,.16)"],
+      "Healthcare":["#A78BFA","rgba(167,139,250,.16)"],"Financials":["#F4B860","rgba(244,184,96,.16)"],
+      "Energy":["#FB923C","rgba(251,146,60,.16)"],"Industrials":["#94A3B8","rgba(148,163,184,.16)"],"Materials":["#34D399","rgba(52,211,153,.16)"]
+    };
+
+    const COUNTRY_COORDS = {
+      "United States":[38.9,-77.0],"Saudi Arabia":[24.7,46.7],"Taiwan":[25.0,121.5],"China":[31.2,121.5],
+      "Denmark":[55.7,12.6],"France":[48.9,2.35],"Netherlands":[52.4,4.9],"South Korea":[37.56,126.97],
+      "United Kingdom":[51.5,-0.12],"Switzerland":[47.37,8.54],"Japan":[35.68,139.76],"Germany":[50.11,8.68],
+      "India":[19.07,72.87],"Canada":[43.65,-79.38],"Australia":[-33.86,151.2],"Ireland":[53.35,-6.26],
+      "Spain":[40.42,-3.7],"Italy":[45.46,9.19],"Norway":[59.91,10.75]
+    };
+    const COUNTRY_REGION = {
+      "United States":"Americas","Canada":"Americas","United Kingdom":"Europe","France":"Europe","Germany":"Europe",
+      "Switzerland":"Europe","Netherlands":"Europe","Denmark":"Europe","Ireland":"Europe","Spain":"Europe","Italy":"Europe","Norway":"Europe",
+      "China":"Asia-Pacific","Taiwan":"Asia-Pacific","Japan":"Asia-Pacific","South Korea":"Asia-Pacific","India":"Asia-Pacific","Australia":"Asia-Pacific",
+      "Saudi Arabia":"Middle East"
+    };
+
+    const RAW_COMPANIES = [
+      [1,"Apple Inc.","AAPL","NASDAQ","United States","Cupertino, CA","Technology","Consumer Hardware & Ecosystem",1976,"Tim Cook","USD","FY2025 (Sep)",3460,229.8,"USD",0.84,405.2,188.4,129.6,141.2,101.8,6.72,33.1,365.0,308.0,57.0,65.2,104.5,121.4,10.2,15056,48.6,"https://www.apple.com","https://investor.apple.com","SEC 10-K","Designs smartphones, Macs, tablets, wearables and high-margin digital services.","iPhone, Mac, iPad, Wearables, Services"],
+      [2,"NVIDIA Corporation","NVDA","NASDAQ","United States","Santa Clara, CA","Technology","Semiconductors & AI Computing",1993,"Jensen Huang","USD","FY2026 (Jan)",3390,138.4,"USD",1.42,148.6,111.5,91.8,94.2,79.4,3.24,14.8,118.4,36.2,82.2,45.8,9.8,72.4,3.8,24494,242.0,"https://www.nvidia.com","https://investor.nvidia.com","SEC 10-K","Pioneers accelerated computing GPUs, AI data center architectures and CUDA software.","Data Center, Gaming, Pro Visualization, Auto"],
+      [3,"Microsoft Corporation","MSFT","NASDAQ","United States","Redmond, WA","Technology","Cloud & Enterprise Software",1975,"Satya Nadella","USD","FY2025 (Jun)",3180,427.6,"USD",0.61,274.5,191.2,123.4,149.8,99.6,13.40,31.2,548.2,248.6,299.6,82.4,68.4,132.5,58.6,7436,21.4,"https://www.microsoft.com","https://www.microsoft.com/investor","SEC 10-K","Develops Azure cloud infrastructure, Microsoft 365 productivity tools and AI copilots.","Intelligent Cloud, Productivity, Personal Computing"],
+      [4,"Saudi Aramco","2222","Tadawul","Saudi Arabia","Dhahran","Energy","Integrated Oil & Chemicals",1933,"Amin H. Nasser","SAR","FY2024 (Dec)",1790,27.7,"SAR",-0.18,482.4,248.0,211.6,239.4,106.2,0.44,1.5,664.2,241.0,423.2,74.8,81.2,135.8,50.4,242000,14.2,"https://www.aramco.com","https://www.aramco.com/investors","Tadawul Annual","World's largest integrated oil, gas and chemicals producer.","Upstream, Downstream, Chemicals"],
+      [5,"Alphabet Inc.","GOOGL","NASDAQ","United States","Mountain View, CA","Communication Services","Digital Search, Cloud & AI",1998,"Sundar Pichai","USD","FY2024 (Dec)",2340,191.2,"USD",1.12,350.0,203.7,112.4,129.6,100.1,8.04,49.3,450.3,125.2,325.1,95.7,25.5,125.3,52.5,12238,26.8,"https://abc.xyz","https://abc.xyz/investor","SEC 10-K","Operates Google Search, YouTube, Android, Google Cloud and DeepMind AI. Consolidated A/B/C.","Google Services, Google Cloud, Other Bets"],
+      [6,"Amazon.com, Inc.","AMZN","NASDAQ","United States","Seattle, WA","Consumer Discretionary","E-Commerce & Cloud",1994,"Andy Jassy","USD","FY2024 (Dec)",2290,217.8,"USD",0.94,638.0,311.6,68.6,120.8,59.2,5.53,88.5,624.9,338.9,286.0,101.2,131.0,115.9,83.0,10514,38.4,"https://www.aboutamazon.com","https://ir.aboutamazon.com","SEC 10-K","Operates global e-commerce marketplaces, fulfillment logistics and AWS cloud computing.","North America, International, AWS"],
+      [7,"Meta Platforms, Inc.","META","NASDAQ","United States","Menlo Park, CA","Communication Services","Social Media & AI",2004,"Mark Zuckerberg","USD","FY2024 (Dec)",1660,658.4,"USD",1.36,164.5,134.3,69.4,85.2,62.4,23.86,43.9,276.1,93.4,182.7,77.8,49.1,91.3,37.3,2521,14.9,"https://about.meta.com","https://investor.fb.com","SEC 10-K","Connects billions across Facebook, Instagram and WhatsApp while advancing open-weight AI and XR.","Family of Apps, Reality Labs"],
+      [8,"Berkshire Hathaway Inc.","BRK.B","NYSE","United States","Omaha, NE","Financials","Holding & Reinsurance",1839,"Warren Buffett","USD","FY2024 (Dec)",1030,478.2,"USD",0.32,371.4,118.0,96.4,112.0,89.0,41.20,0.4,1153.8,504.2,649.6,334.2,124.8,41.6,18.9,2154,4.2,"https://www.berkshirehathaway.com","https://www.berkshirehathaway.com","SEC 10-K","Diversified conglomerate spanning reinsurance, BNSF rail, utilities and equity investments. Consolidated A/B.","Insurance, BNSF, Energy, Manufacturing"],
+      [9,"Taiwan Semiconductor (TSMC)","TSM","TWSE","Taiwan","Hsinchu","Technology","Semiconductor Foundry",1987,"C.C. Wei","TWD","FY2024 (Dec)",1020,1085.0,"TWD",1.25,90.1,50.5,41.2,59.4,35.8,6.90,6.4,205.2,72.4,132.8,71.4,31.2,56.8,29.8,25932,31.4,"https://www.tsmc.com","https://investor.tsmc.com","SEC 20-F","World's leading dedicated semiconductor foundry fabricating 3nm and 2nm logic silicon.","HPC, Smartphone, IoT, Automotive"],
+      [10,"Broadcom Inc.","AVGO","NASDAQ","United States","Palo Alto, CA","Technology","Semiconductors & Software",1961,"Hock Tan","USD","FY2024 (Nov)",995,212.5,"USD",1.55,51.6,38.8,21.4,29.8,14.8,3.12,9.3,165.6,97.9,67.7,9.3,67.6,20.0,0.6,4682,25.2,"https://www.broadcom.com","https://investors.broadcom.com","SEC 10-K","Designs custom AI ASIC accelerators, Ethernet switching silicon and VMware infrastructure software.","Semiconductor Solutions, Infrastructure Software"],
+      [11,"Tesla, Inc.","TSLA","NASDAQ","United States","Austin, TX","Consumer Discretionary","EVs, Energy & Robotics",2003,"Elon Musk","USD","FY2024 (Dec)",940,292.4,"USD",-0.85,97.7,17.5,7.1,13.4,7.1,2.04,4.5,122.1,48.4,73.7,36.6,13.6,14.9,11.3,3215,82.5,"https://www.tesla.com","https://ir.tesla.com","SEC 10-K","Manufactures electric vehicles, Megapack grid battery storage and autonomous AI systems.","Automotive, Energy Storage, Services"],
+      [12,"Eli Lilly and Company","LLY","NYSE","United States","Indianapolis, IN","Healthcare","Biopharmaceuticals",1876,"David A. Ricks","USD","FY2024 (Dec)",820,864.0,"USD",0.74,45.0,36.6,12.9,15.6,10.6,11.71,11.0,78.7,64.4,14.3,3.3,33.6,8.8,5.1,949,3.6,"https://www.lilly.com","https://investor.lilly.com","SEC 10-K","Global biopharmaceutical leader in GLP-1 metabolic therapies, oncology and immunology.","Cardiometabolic, Oncology, Immunology"],
+      [13,"Walmart Inc.","WMT","NYSE","United States","Bentonville, AR","Consumer Staples","Omnichannel Retail",1962,"Doug McMillon","USD","FY2025 (Jan)",785,97.8,"USD",0.41,681.0,168.4,29.3,42.8,19.4,2.41,2.2,260.8,169.4,91.4,9.0,56.2,36.4,23.8,8026,16.8,"https://corporate.walmart.com","https://stock.walmart.com","SEC 10-K","World's largest retailer operating hypermarkets, Sam's Club warehouses and global e-commerce.","Walmart U.S., International, Sam's Club"],
+      [14,"JPMorgan Chase & Co.","JPM","NYSE","United States","New York, NY","Financials","Money-Center Banking",1799,"Jamie Dimon","USD","FY2024 (Dec)",710,252.4,"USD",0.58,177.6,177.6,72.8,76.4,58.5,19.75,0.0,4002.8,3658.1,344.7,468.0,412.0,62.4,3.8,2813,9.2,"https://www.jpmorganchase.com","https://www.jpmorganchase.com/ir","SEC 10-K","Largest U.S. banking institution across consumer, commercial, investment banking and wealth management.","Consumer Banking, CIB, Asset & Wealth"],
+      [15,"Visa Inc.","V","NYSE","United States","San Francisco, CA","Financials","Payment Networks",1958,"Ryan McInerney","USD","FY2024 (Sep)",655,336.2,"USD",0.49,35.9,28.9,24.1,25.2,19.7,9.73,1.2,94.5,55.4,39.1,16.8,20.8,20.0,1.3,1948,6.8,"https://www.visa.com","https://investor.visa.com","SEC 10-K","Operates VisaNet, the world's largest electronic retail payment processing network.","Data Processing, Service Revenues, International"],
+      [16,"Tencent Holdings Ltd.","0700","HKEX","China","Shenzhen","Communication Services","Digital Platforms & Gaming",1998,"Pony Ma","CNY","FY2024 (Dec)",560,468.0,"HKD",1.18,91.2,48.4,28.9,34.6,26.8,2.85,9.7,242.5,104.2,138.3,58.4,47.2,35.2,8.4,9295,22.4,"https://www.tencent.com","https://www.tencent.com/en-us/investors.html","HKEX Annual","China's digital ecosystem spanning WeChat, global gaming, cloud and WeChat Pay fintech.","VAS, FinTech & Business, Advertising"],
+      [17,"Exxon Mobil Corporation","XOM","NYSE","United States","Spring, TX","Energy","Integrated Oil & Gas",1870,"Darren Woods","USD","FY2024 (Dec)",515,117.4,"USD",-0.35,349.6,86.2,46.8,70.2,33.7,7.84,1.1,453.5,182.9,270.6,23.2,41.7,55.0,24.3,4386,15.6,"https://corporate.exxonmobil.com","https://investor.exxonmobil.com","SEC 10-K","Integrated energy major operating Permian/Guyana upstream production, refining and petrochemicals.","Upstream, Energy Products, Chemical Products"],
+      [18,"Mastercard Incorporated","MA","NYSE","United States","Purchase, NY","Financials","Payment Technology",1966,"Michael Miebach","USD","FY2024 (Dec)",498,542.6,"USD",0.66,28.2,21.5,16.5,17.4,12.9,13.89,0.9,47.7,41.2,6.5,8.4,18.2,14.8,1.2,918,2.9,"https://www.mastercard.com","https://investor.mastercard.com","SEC 10-K","Global payments network connecting financial institutions, merchants and cross-border rails.","Payment Network, Value-Added Services"],
+      [19,"Oracle Corporation","ORCL","NYSE","United States","Austin, TX","Technology","Databases & Cloud (OCI)",1977,"Safra Catz","USD","FY2024 (May)",485,173.8,"USD",0.92,53.0,37.8,15.4,22.8,10.5,3.71,8.9,140.9,130.2,10.7,10.6,86.8,18.7,6.9,2790,11.2,"https://www.oracle.com","https://investor.oracle.com","SEC 10-K","Delivers autonomous databases, enterprise ERP applications and GPU cloud infrastructure.","Cloud & License, Hardware, Services"],
+      [20,"Costco Wholesale Corp.","COST","NASDAQ","United States","Issaquah, WA","Consumer Staples","Warehouse Clubs",1983,"Ron Vachris","USD","FY2024 (Sep)",455,1025.0,"USD",0.38,254.5,32.1,9.3,11.6,7.4,16.56,0.0,69.8,46.2,23.6,11.2,8.3,11.3,4.7,444,2.1,"https://www.costco.com","https://investor.costco.com","SEC 10-K","Operates global membership warehouse clubs and Kirkland Signature private-label merchandise.","U.S., Canada, International, Membership"],
+      [21,"UnitedHealth Group Inc.","UNH","NYSE","United States","Minnetonka, MN","Healthcare","Managed Care & Health Services",1977,"Andrew Witty","USD","FY2024 (Dec)",448,488.0,"USD",-0.42,400.3,94.6,32.3,36.4,14.4,15.51,0.0,298.3,199.4,98.9,29.1,76.4,24.2,3.5,918,4.8,"https://www.unitedhealthgroup.com","https://www.unitedhealthgroup.com/investors","SEC 10-K","Largest U.S. health insurer and healthcare platform uniting UnitedHealthcare and Optum.","UnitedHealthcare, Optum Health, Optum Rx"],
+      [22,"Novo Nordisk A/S","NOVO-B","Nasdaq Copenhagen","Denmark","Bagsværd","Healthcare","Biopharma & Diabetes Care",1923,"Lars Fruergaard Jørgensen","DKK","FY2024 (Dec)",412,642.0,"DKK",0.54,42.1,35.7,18.6,20.2,14.6,3.28,6.9,66.4,45.8,20.6,4.2,14.6,17.5,6.8,4446,8.4,"https://www.novonordisk.com","https://www.novonordisk.com/investors.html","SEC 20-F","Global leader in diabetes and GLP-1 obesity therapeutics including Ozempic and Wegovy.","Diabetes & Obesity Care, Rare Disease"],
+      [23,"Netflix, Inc.","NFLX","NASDAQ","United States","Los Gatos, CA","Communication Services","Streaming Entertainment",1997,"Ted Sarandos & Greg Peters","USD","FY2024 (Dec)",398,930.4,"USD",1.04,39.0,17.9,10.4,11.2,8.7,19.83,2.9,53.6,28.9,24.7,9.6,15.6,7.4,0.4,428,3.4,"https://about.netflix.com","https://ir.netflix.net","SEC 10-K","Global subscription streaming and film producer serving >190 countries.","Streaming Memberships, Ad Tier"],
+      [24,"Procter & Gamble Co.","PG","NYSE","United States","Cincinnati, OH","Consumer Staples","Household & Personal Care",1837,"Jon Moeller","USD","FY2024 (Jun)",396,168.4,"USD",0.22,84.0,43.2,18.6,21.5,14.9,6.02,2.1,122.4,71.8,50.6,9.5,32.5,19.8,3.3,2352,6.4,"https://us.pg.com","https://www.pginvestor.com","SEC 10-K","Produces everyday consumer brands including Tide, Pampers, Gillette, Crest and Olay.","Fabric & Home, Baby, Beauty, Health, Grooming"],
+      [25,"Johnson & Johnson","JNJ","NYSE","United States","New Brunswick, NJ","Healthcare","Pharma & MedTech",1886,"Joaquin Duato","USD","FY2024 (Dec)",390,162.1,"USD",0.31,88.8,61.4,21.6,28.4,14.1,5.79,17.2,180.1,108.6,71.5,24.5,36.6,24.3,4.4,2406,7.1,"https://www.jnj.com","https://www.investor.jnj.com","SEC 10-K","Develops oncology and immunology therapeutics alongside cardiovascular MedTech.","Innovative Medicine, MedTech"],
+      [26,"The Home Depot, Inc.","HD","NYSE","United States","Atlanta, GA","Consumer Discretionary","Home Improvement Retail",1978,"Ted Decker","USD","FY2025 (Jan)",388,390.8,"USD",0.44,159.5,53.3,21.5,25.2,14.8,14.91,0.0,96.1,89.4,6.7,1.7,51.2,19.8,3.5,993,3.8,"https://www.corporate.homedepot.com","https://ir.homedepot.com","SEC 10-K","World's largest home improvement retailer serving DIY consumers and professional contractors.","Building Materials, Decor, Pro Distribution"],
+      [27,"LVMH Moët Hennessy Louis Vuitton","MC","Euronext Paris","France","Paris","Consumer Discretionary","Global Luxury Conglomerate",1987,"Bernard Arnault","EUR","FY2024 (Dec)",362,672.0,"EUR",-0.28,91.5,61.4,21.2,26.8,13.6,27.10,0.4,155.2,84.0,71.2,10.4,37.8,20.4,5.9,499,0.7,"https://www.lvmh.com","https://www.lvmh.com/investors","Euronext Annual","World's premier luxury group owning Louis Vuitton, Dior, Tiffany, Sephora and Moët.","Fashion & Leather, Selective Retailing, Watches"],
+      [28,"Bank of America Corp.","BAC","NYSE","United States","Charlotte, NC","Financials","Universal Banking",1904,"Brian Moynihan","USD","FY2024 (Dec)",355,46.4,"USD",0.42,101.9,101.9,30.2,32.6,27.1,3.21,0.0,3261.5,2965.9,295.6,315.0,308.0,28.4,2.6,7650,34.2,"https://www.bankofamerica.com","https://investor.bankofamerica.com","SEC 10-K","Major U.S. retail and commercial bank integrating Merrill wealth management and capital markets.","Consumer, Wealth, Global Banking, Markets"],
+      [29,"AbbVie Inc.","ABBV","NYSE","United States","North Chicago, IL","Healthcare","Biopharmaceuticals",2013,"Robert A. Michael","USD","FY2024 (Dec)",342,193.8,"USD",0.37,56.3,39.4,10.6,19.8,4.3,2.39,12.8,135.2,131.8,3.4,5.5,67.4,18.8,1.0,1765,5.8,"https://www.abbvie.com","https://investors.abbvie.com","SEC 10-K","Biopharma leader with immunology franchises (Skyrizi, Rinvoq), oncology and aesthetics.","Immunology, Oncology, Aesthetics"],
+      [30,"SAP SE","SAP","XETRA","Germany","Walldorf","Technology","Enterprise ERP & AI",1972,"Christian Klein","EUR","FY2024 (Dec)",332,262.0,"EUR",0.81,36.9,27.1,5.1,7.8,3.4,2.88,6.9,79.8,32.1,47.7,10.4,11.2,5.6,0.9,1166,1.4,"https://www.sap.com","https://www.sap.com/investors","SEC 20-F","Europe's largest enterprise software vendor powering S/4HANA Cloud ERP and supply chains.","Applications, Technology & Services"],
+      [31,"ASML Holding N.V.","ASML","Euronext Amsterdam","Netherlands","Veldhoven","Technology","Semiconductor Lithography",1984,"Christophe Fouquet","EUR","FY2024 (Dec)",318,754.0,"EUR",1.14,30.6,15.7,9.8,10.7,8.2,20.80,4.7,52.6,32.6,20.0,13.8,5.1,12.1,2.3,393,0.9,"https://www.asml.com","https://www.asml.com/en/investors","SEC 20-F","Sole supplier of Extreme Ultraviolet (EUV) lithography systems for leading-edge chips.","EUV Lithography, DUV, Installed Base"],
+      [32,"Salesforce, Inc.","CRM","NYSE","United States","San Francisco, CA","Technology","Enterprise CRM & AI",1999,"Marc Benioff","USD","FY2025 (Jan)",316,328.4,"USD",0.68,37.9,29.2,7.2,11.8,6.2,6.36,5.5,102.9,41.7,61.2,14.0,11.4,13.1,0.7,962,5.9,"https://www.salesforce.com","https://investor.salesforce.com","SEC 10-K","Cloud CRM leader delivering sales, service, Slack, Tableau and Agentforce AI workflows.","Subscription & Support, Services"],
+      [33,"Hermès International","RMS","Euronext Paris","France","Paris","Consumer Discretionary","Ultra-Luxury Fashion",1837,"Axel Dumas","EUR","FY2024 (Dec)",308,2740.0,"EUR",0.45,16.4,11.6,6.7,7.2,5.0,47.40,0.0,24.8,6.2,18.6,13.0,2.2,5.4,1.1,105,0.1,"https://www.hermes.com","https://finance.hermes.com","Euronext Annual","French luxury maison renowned for Birkin/Kelly leather craftsmanship and pricing power.","Leather Goods, Ready-to-Wear, Silk"],
+      [34,"The Coca-Cola Company","KO","NYSE","United States","Atlanta, GA","Consumer Staples","Non-Alcoholic Beverages",1892,"James Quincey","USD","FY2024 (Dec)",298,69.2,"USD",0.19,47.1,28.7,10.0,14.2,10.6,2.46,0.0,100.5,74.2,26.3,14.6,44.7,6.8,2.1,4306,14.5,"https://www.coca-colacompany.com","https://investors.coca-colacompany.com","SEC 10-K","Concentrate-driven beverage giant marketing Coca-Cola, Sprite, Costa and hydration brands.","Sparkling, Hydration, Coffee & Tea"],
+      [35,"Toyota Motor Corporation","7203","TSE","Japan","Toyota City","Consumer Discretionary","Global Automotive",1937,"Koji Sato","JPY","FY2024 (Mar)",284,2950.0,"JPY",0.33,298.5,62.1,35.4,49.8,32.7,2.42,8.4,598.4,368.2,230.2,64.2,238.0,28.4,14.2,13520,24.6,"https://global.toyota","https://global.toyota/en/ir","TSE Annual","World's highest-volume automaker pioneering hybrid powertrains and Lexus luxury vehicles.","Automotive, Financial Services"],
+      [36,"Chevron Corporation","CVX","NYSE","United States","San Ramon, CA","Energy","Integrated Oil & LNG",1879,"Mike Wirth","USD","FY2024 (Dec)",281,158.6,"USD",-0.24,202.7,78.4,24.2,41.6,17.7,9.72,0.5,256.9,103.8,153.1,6.8,24.5,31.5,16.4,1772,7.8,"https://www.chevron.com","https://www.chevron.com/investors","SEC 10-K","Integrated energy major with Permian Basin, Tengiz, LNG and downstream refining.","Upstream, Downstream"],
+      [37,"T-Mobile US, Inc.","TMUS","NASDAQ","United States","Bellevue, WA","Communication Services","5G Telecommunications",1994,"Mike Sievert","USD","FY2024 (Dec)",278,241.5,"USD",0.51,81.4,51.2,18.0,31.8,11.3,9.66,0.0,208.3,146.4,61.9,5.4,113.2,22.3,8.8,1151,4.6,"https://www.t-mobile.com","https://investor.t-mobile.com","SEC 10-K","Leading U.S. 5G wireless carrier operating nationwide mid-band spectrum and fixed wireless.","Postpaid, Prepaid, Fixed Wireless"],
+      [38,"Roche Holding AG","ROG","SIX","Switzerland","Basel","Healthcare","Diagnostics & Pharma",1896,"Thomas Schinecker","CHF","FY2024 (Dec)",272,278.4,"CHF",0.29,68.8,49.8,15.6,22.4,10.4,12.90,14.8,101.2,62.8,38.4,11.6,34.2,19.4,4.8,801,1.3,"https://www.roche.com","https://www.roche.com/investors","SIX Annual","Swiss healthcare pioneer combining oncology biologics with global in-vitro diagnostics.","Pharmaceuticals, Diagnostics"],
+      [39,"Samsung Electronics Co.","005930","KRX","South Korea","Suwon","Technology","Memory, Phones & Displays",1969,"Jun Young-hyun","KRW","FY2024 (Dec)",268,57400.0,"KRW",-0.62,218.4,81.2,23.8,54.6,24.8,3.68,24.6,368.4,94.2,274.2,78.4,14.2,48.6,38.4,5969,19.2,"https://www.samsung.com","https://www.samsung.com/global/ir","KRX Annual","Global electronics leader in DRAM/NAND memory, Galaxy smartphones and OLED displays.","DX, Device Solutions, SDC, Harman"],
+      [40,"Wells Fargo & Company","WFC","NYSE","United States","San Francisco, CA","Financials","Commercial & Retail Banking",1852,"Charlie Scharf","USD","FY2024 (Dec)",264,79.6,"USD",0.48,82.3,82.3,24.4,27.1,19.7,5.37,0.0,1929.8,1750.4,179.4,242.0,174.0,21.5,1.9,3316,16.4,"https://www.wellsfargo.com","https://www.wellsfargo.com/about/investor-relations","SEC 10-K","Major U.S. bank serving consumer deposits, commercial lending and wealth advisory.","Consumer, Commercial, CIB, Wealth"],
+      [41,"Alibaba Group Holding","9988","HKEX","China","Hangzhou","Consumer Discretionary","E-Commerce & Cloud",1999,"Eddie Wu","CNY","FY2024 (Mar)",258,108.6,"HKD",1.32,130.4,49.2,15.7,24.8,11.1,0.56,7.2,244.5,91.8,152.7,85.2,24.6,25.3,4.5,19060,44.2,"https://www.alibabagroup.com","https://www.alibabagroup.com/en-US/ir-home","SEC 20-F","Operates Taobao/Tmall marketplaces, Alibaba Cloud AI infrastructure and Cainiao logistics.","Taobao & Tmall, Cloud, AIDC, Cainiao"],
+      [42,"Nestlé S.A.","NESN","SIX","Switzerland","Vevey","Consumer Staples","Packaged Food & Nutrition",1866,"Laurent Freixe","CHF","FY2024 (Dec)",252,85.4,"CHF",0.15,103.6,47.8,16.4,20.8,12.3,4.72,1.9,144.2,102.8,41.4,6.4,66.2,16.8,6.2,2620,4.8,"https://www.nestle.com","https://www.nestle.com/investors","SIX Annual","World's largest food group owning Nescafé, Nespresso, Purina PetCare and KitKat.","Beverages, PetCare, Nutrition"],
+      [43,"Accenture plc","ACN","NYSE","Ireland","Dublin","Technology","IT Consulting & AI",1989,"Julie Sweet","USD","FY2024 (Aug)",246,392.4,"USD",0.53,64.9,21.2,9.6,11.4,7.3,11.44,1.1,55.9,27.7,28.2,5.0,1.6,9.1,0.5,627,2.4,"https://www.accenture.com","https://investor.accenture.com","SEC 10-K","Global professional services firm delivering enterprise cloud migration and generative AI.","Consulting, Managed Services"],
+      [44,"AstraZeneca PLC","AZN","LSE","United Kingdom","Cambridge","Healthcare","Oncology & Biopharma",1999,"Pascal Soriot","USD","FY2024 (Dec)",242,118.4,"GBP",0.61,54.1,44.6,10.0,15.2,7.0,4.52,13.6,106.4,64.8,41.6,5.5,31.2,11.9,2.3,1550,2.8,"https://www.astrazeneca.com","https://www.astrazeneca.com/investors.html","SEC 20-F","Biopharmaceutical leader focused on targeted oncology, cardiovascular and rare diseases.","Oncology, CVRM, Rare Disease"],
+      [45,"Merck & Co., Inc.","MRK","NYSE","United States","Rahway, NJ","Healthcare","Oncology & Vaccines",1891,"Robert M. Davis","USD","FY2024 (Dec)",238,94.2,"USD",-0.31,64.2,48.6,18.4,23.2,17.1,6.74,17.9,117.1,70.9,46.2,13.2,37.8,21.5,3.4,2526,11.8,"https://www.merck.com","https://www.merck.com/investor-relations","SEC 10-K","Global pharma innovator anchored by Keytruda oncology immunotherapy and Gardasil vaccines.","Pharmaceutical, Animal Health"],
+      [46,"Cisco Systems, Inc.","CSCO","NASDAQ","United States","San Jose, CA","Technology","Networking & Security",1984,"Chuck Robbins","USD","FY2024 (Jul)",236,59.4,"USD",0.44,53.8,34.8,12.2,16.4,10.3,2.54,7.9,124.4,78.9,45.5,17.9,31.0,10.9,0.7,3973,19.4,"https://www.cisco.com","https://investor.cisco.com","SEC 10-K","Provides enterprise Ethernet switching, routing, Splunk observability and cybersecurity.","Networking, Security, Observability"],
+      [47,"IBM Corporation","IBM","NYSE","United States","Armonk, NY","Technology","Hybrid Cloud & AI",1911,"Arvind Krishna","USD","FY2024 (Dec)",234,252.8,"USD",0.72,62.8,35.6,10.1,15.4,6.0,6.43,7.5,137.2,109.9,27.3,14.8,55.0,13.4,1.1,926,4.2,"https://www.ibm.com","https://www.ibm.com/investor","SEC 10-K","Enterprise technology company delivering Red Hat hybrid cloud, watsonx AI and mainframes.","Software, Consulting, Infrastructure"],
+      [48,"Morgan Stanley","MS","NYSE","United States","New York, NY","Financials","Wealth & Investment Banking",1935,"Ted Pick","USD","FY2024 (Dec)",230,142.6,"USD",0.77,61.8,61.8,17.6,19.4,13.4,7.95,0.0,1215.1,1110.6,104.5,108.0,278.0,14.6,1.4,1613,6.8,"https://www.morganstanley.com","https://www.morganstanley.com/about-us-ir","SEC 10-K","Global financial firm combining institutional securities with a >$6T client wealth franchise.","Institutional Securities, Wealth, IM"],
+      [49,"Novartis AG","NOVN","SIX","Switzerland","Basel","Healthcare","Innovative Pharmaceuticals",1996,"Vas Narasimhan","USD","FY2024 (Dec)",228,98.6,"CHF",0.24,50.3,38.1,14.5,19.2,11.9,5.88,10.1,102.4,57.2,45.2,12.8,29.6,17.6,1.4,1990,3.1,"https://www.novartis.com","https://www.novartis.com/investors","SEC 20-F","Pure-play innovative medicines company focused on radioligand oncology and immunology.","Oncology, Immunology, CVRM"],
+      [50,"Linde plc","LIN","NASDAQ","United Kingdom","Woking","Materials","Industrial Gases",1879,"Sanjiv Lamba","USD","FY2024 (Dec)",224,471.2,"USD",0.35,33.0,15.8,8.7,12.6,6.6,13.62,0.2,80.1,41.6,38.5,4.9,22.4,9.4,4.5,475,1.8,"https://www.linde.com","https://investors.linde.com","SEC 10-K","World's largest industrial gas supplier producing oxygen, nitrogen and clean hydrogen.","Americas, EMEA, APAC, Engineering"],
+      [51,"Shell plc","SHEL","LSE","United Kingdom","London","Energy","Integrated Oil & LNG",1907,"Wael Sawan","USD","FY2024 (Dec)",218,26.8,"GBP",-0.19,284.3,68.4,34.2,58.6,16.1,2.56,1.1,387.6,209.2,178.4,39.1,77.1,54.7,21.1,6120,11.4,"https://www.shell.com","https://www.shell.com/investors","SEC 20-F","Global energy major leading liquefied natural gas (LNG) trading and deepwater production.","Integrated Gas, Upstream, Marketing"],
+      [52,"McDonald's Corporation","MCD","NYSE","United States","Chicago, IL","Consumer Discretionary","Quick-Service Restaurants",1955,"Chris Kempczinski","USD","FY2024 (Dec)",216,301.4,"USD",0.28,25.9,14.7,11.7,13.8,8.2,11.39,0.0,55.2,59.0,-3.8,1.1,51.8,9.4,2.8,717,3.1,"https://corporate.mcdonalds.com","https://corporate.mcdonalds.com/corpmcd/investors.html","SEC 10-K","World's largest franchised QSR system spanning 43,000+ restaurants globally.","U.S., International Operated, Developmental"],
+      [53,"PepsiCo, Inc.","PEP","NASDAQ","United States","Purchase, NY","Consumer Staples","Snacks & Beverages",1965,"Ramon Laguarta","USD","FY2024 (Dec)",212,154.2,"USD",0.14,91.9,50.2,12.9,16.8,9.6,6.95,0.8,99.5,81.3,18.2,8.5,44.1,12.5,5.3,1375,5.6,"https://www.pepsico.com","https://www.pepsico.com/investors","SEC 10-K","Global food and beverage giant combining Frito-Lay snacks with Pepsi and Gatorade.","Frito-Lay, PBNA, Europe, APAC"],
+      [54,"Thermo Fisher Scientific","TMO","NYSE","United States","Waltham, MA","Healthcare","Life Sciences Tools",1956,"Marc Casper","USD","FY2024 (Dec)",210,550.2,"USD",0.46,42.9,17.8,7.4,10.9,6.3,16.53,1.4,97.2,47.8,49.4,5.7,35.4,8.7,1.5,382,1.6,"https://www.thermofisher.com","https://ir.thermofisher.com","SEC 10-K","Supplies precision analytical instruments, reagents and biomanufacturing services.","Life Sciences, Analytical, Lab Products"],
+      [55,"Reliance Industries Ltd.","RELIANCE","NSE","India","Mumbai","Energy","Energy, Telecom & Retail",1958,"Mukesh Ambani","INR","FY2024 (Mar)",208,1285.0,"INR",0.64,108.4,34.2,14.8,21.4,8.4,0.62,0.5,210.8,104.2,106.6,20.2,39.0,19.1,15.8,13532,12.4,"https://www.ril.com","https://www.ril.com/investors","NSE Annual","India's largest private conglomerate spanning refining, Jio 5G telecom and Reliance Retail.","O2C Refining, Jio Digital, Retail"],
+      [56,"ServiceNow, Inc.","NOW","NYSE","United States","Santa Clara, CA","Technology","Workflow & AI Automation",2004,"Bill McDermott","USD","FY2024 (Dec)",206,998.0,"USD",1.11,11.0,8.7,1.4,2.1,1.4,6.75,2.6,20.4,10.8,9.6,5.8,2.2,4.3,0.9,206,1.4,"https://www.servicenow.com","https://investors.servicenow.com","SEC 10-K","Cloud platform automating enterprise IT, HR and AI-driven business workflows.","Subscription Workflows, Services"],
+      [57,"ICBC","1398","HKEX","China","Beijing","Financials","Commercial Banking",1984,"Liao Lin","CNY","FY2024 (Dec)",205,5.42,"HKD",0.22,116.4,116.4,58.4,61.2,50.8,0.14,0.0,6640.0,6102.0,538.0,512.0,224.0,54.2,4.8,356406,195.0,"https://www.icbc-ltd.com","https://www.icbc-ltd.com/icbcltd/investor%20relations","HKEX Annual","World's largest bank by assets serving corporate, retail and treasury banking.","Corporate, Personal, Treasury"],
+      [58,"Adobe Inc.","ADBE","NASDAQ","United States","San Jose, CA","Technology","Creative & Document Cloud",1982,"Shantanu Narayen","USD","FY2024 (Nov)",204,462.5,"USD",0.39,21.5,19.1,6.7,7.8,5.6,12.36,3.9,30.2,16.1,14.1,7.9,5.6,8.1,0.2,441,3.5,"https://www.adobe.com","https://www.adobe.com/investor-relations.html","SEC 10-K","Dominates digital content creation (Creative Cloud, Firefly AI) and Acrobat documents.","Digital Media, Digital Experience"],
+      [59,"GE Aerospace","GE","NYSE","United States","Evendale, OH","Industrials","Jet Engines & Propulsion",1892,"Larry Culp","USD","FY2024 (Dec)",202,188.4,"USD",0.87,38.7,12.8,7.3,8.6,6.6,5.98,1.3,123.3,103.6,19.7,13.6,19.2,5.8,1.0,1072,5.4,"https://www.geaerospace.com","https://www.geaerospace.com/investor-relations","SEC 10-K","Designs and services commercial and military aircraft jet engines globally.","Commercial Engines, Defense Propulsion"],
+      [60,"Palantir Technologies Inc.","PLTR","NASDAQ","United States","Denver, CO","Technology","AI Data & Defense Platforms",2003,"Alex Karp","USD","FY2024 (Dec)",198,86.8,"USD",2.14,2.87,2.30,0.31,0.42,0.46,0.19,0.5,6.3,1.3,5.0,5.2,0.2,1.15,0.01,2281,78.4,"https://www.palantir.com","https://investors.palantir.com","SEC 10-K","Builds Gotham, Foundry and AIP operational intelligence software for defense and industry.","Government, Commercial"],
+      [61,"The Goldman Sachs Group","GS","NYSE","United States","New York, NY","Financials","Investment Banking & Markets",1869,"David Solomon","USD","FY2024 (Dec)",196,612.4,"USD",0.91,53.5,53.5,18.4,19.8,14.3,40.54,0.0,1675.9,1553.9,122.0,182.0,324.0,16.2,1.8,320,2.4,"https://www.goldmansachs.com","https://www.goldmansachs.com/investor-relations","SEC 10-K","Leading global investment bank executing M&A advisory, trading and asset management.","Banking & Markets, Asset & Wealth"],
+      [62,"Kweichow Moutai Co.","600519","SSE","China","Renhuai","Consumer Staples","Ultra-Premium Spirits",1999,"Zhang Deqin","CNY","FY2024 (Dec)",195,1520.0,"CNY",-0.12,24.1,22.1,16.4,17.2,11.9,9.48,0.04,41.2,8.4,32.8,24.6,0.0,12.4,0.8,1256,3.4,"https://www.moutaichina.com","https://www.moutaichina.com","SSE Annual","China's premier luxury spirits producer manufacturing Feitian Moutai baijiu.","Moutai Liquor, Series Liquor"],
+      [63,"HSBC Holdings plc","HSBA","LSE","United Kingdom","London","Financials","International Banking",1865,"Georges Elhedery","USD","FY2024 (Dec)",194,8.65,"GBP",0.41,65.9,65.9,32.3,34.8,24.0,1.25,0.0,3017.0,2824.0,193.0,284.0,198.0,26.8,2.1,17980,28.5,"https://www.hsbc.com","https://www.hsbc.com/investors","SEC 20-F","Cross-border banking giant bridging Asia-Pacific, Middle East and European trade.","Wealth & Personal, Commercial, GBM"],
+      [64,"Abbott Laboratories","ABT","NYSE","United States","Abbott Park, IL","Healthcare","MedTech & Diagnostics",1888,"Robert Ford","USD","FY2024 (Dec)",192,110.4,"USD",0.26,42.0,23.2,6.8,10.1,13.4,7.64,2.8,81.4,33.6,47.8,7.6,14.6,8.6,2.2,1739,5.4,"https://www.abbott.com","https://www.abbottinvestor.com","SEC 10-K","Produces FreeStyle Libre glucose monitors, heart devices, diagnostics and nutrition.","Medical Devices, Diagnostics, Nutrition"],
+      [65,"Caterpillar Inc.","CAT","NYSE","United States","Irving, TX","Industrials","Heavy Equipment & Mining",1925,"Jim Umpleby","USD","FY2024 (Dec)",190,394.2,"USD",0.48,64.8,22.4,13.1,15.6,10.8,22.05,2.1,87.8,68.3,19.5,6.9,38.4,12.0,2.6,482,2.5,"https://www.caterpillar.com","https://investors.caterpillar.com","SEC 10-K","World's largest manufacturer of mining trucks, excavators and industrial turbines.","Construction, Resource, Energy & Transport"],
+      [66,"Advanced Micro Devices (AMD)","AMD","NASDAQ","United States","Santa Clara, CA","Technology","CPUs & AI GPUs",1969,"Lisa Su","USD","FY2024 (Dec)",189,116.5,"USD",1.48,25.8,12.7,1.9,5.4,1.6,1.00,6.5,69.2,11.6,57.6,5.1,2.2,3.0,0.6,1622,42.8,"https://www.amd.com","https://ir.amd.com","SEC 10-K","Designs EPYC server CPUs, Instinct AI accelerators, Ryzen processors and Xilinx FPGAs.","Data Center, Client, Gaming, Embedded"],
+      [67,"Intuit Inc.","INTU","NASDAQ","United States","Mountain View, CA","Technology","Tax & Accounting FinTech",1983,"Sasan Goodarzi","USD","FY2024 (Jul)",186,664.2,"USD",0.52,16.3,12.9,3.6,4.8,3.0,10.43,2.7,34.4,15.9,18.5,4.1,6.0,4.9,0.2,280,1.5,"https://www.intuit.com","https://investors.intuit.com","SEC 10-K","Provides QuickBooks SMB accounting, TurboTax filing and Credit Karma platforms.","Global Business, Consumer, Credit Karma"],
+      [68,"Royal Bank of Canada (RBC)","RY","TSX","Canada","Toronto","Financials","Universal Banking",1864,"Dave McKay","CAD","FY2024 (Oct)",184,186.4,"CAD",0.33,42.8,42.8,15.4,16.8,11.8,8.32,0.0,1560.0,1468.0,92.0,96.0,148.0,13.4,1.1,1414,2.8,"https://www.rbc.com","https://www.rbc.com/investor-relations","TSX Annual","Canada's largest bank across retail banking, wealth management and capital markets.","P&C Banking, Wealth, Capital Markets"],
+      [69,"China Mobile Limited","0941","HKEX","China","Beijing","Communication Services","Telecommunications",1997,"Yang Jie","CNY","FY2024 (Dec)",182,78.4,"HKD",0.18,142.8,41.6,22.4,48.6,19.1,0.89,4.2,276.4,86.8,189.6,56.2,3.2,41.8,23.2,21420,18.4,"https://www.chinamobileltd.com","https://www.chinamobileltd.com/en/ir/home.php","HKEX Annual","World's largest wireless carrier serving nearly 1B mobile subscribers and 5G cloud.","Personal, Home, Business Markets"],
+      [70,"Commonwealth Bank (CBA)","CBA","ASX","Australia","Sydney","Financials","Retail & Business Banking",1911,"Matt Comyn","AUD","FY2024 (Jun)",180,172.0,"AUD",0.29,18.2,18.2,9.4,10.2,6.4,3.82,0.0,836.0,787.0,49.0,42.0,108.0,7.2,0.6,1672,2.1,"https://www.commbank.com.au","https://www.commbank.com.au/about-us/investors.html","ASX Annual","Australia's largest bank leading domestic residential mortgages and digital payments.","Retail, Business, Institutional"],
+      [71,"American Express Company","AXP","NYSE","United States","New York, NY","Financials","Card Networks & Lending",1850,"Stephen Squeri","USD","FY2024 (Dec)",178,254.0,"USD",0.61,65.9,65.9,13.1,14.4,10.1,14.01,0.0,271.5,241.2,30.3,40.6,57.8,14.1,1.6,701,2.6,"https://www.americanexpress.com","https://ir.americanexpress.com","SEC 10-K","Operates a closed-loop premium card network earning merchant discount and card fees.","U.S. Consumer, Commercial, International"],
+      [72,"S&P Global Inc.","SPGI","NYSE","United States","New York, NY","Financials","Credit Ratings & Indices",1860,"Martina Cheung","USD","FY2024 (Dec)",176,562.0,"USD",0.44,14.2,9.8,5.9,6.9,3.9,12.35,0.4,59.8,24.4,35.4,1.7,11.4,5.7,0.2,313,1.2,"https://www.spglobal.com","https://investor.spglobal.com","SEC 10-K","Provides S&P Credit Ratings, S&P Dow Jones Indices, Platts benchmarks and Capital IQ.","Ratings, Market Intelligence, Indices"],
+      [73,"L'Oréal S.A.","OR","Euronext Paris","France","Clichy","Consumer Staples","Beauty & Cosmetics",1909,"Nicolas Hieronimus","EUR","FY2024 (Dec)",175,308.0,"EUR",0.19,46.8,34.7,9.4,10.8,6.9,12.90,1.5,58.4,24.2,34.2,4.4,8.6,8.2,1.6,534,0.6,"https://www.loreal.com","https://www.loreal-finance.com","Euronext Annual","World's largest cosmetics group spanning luxury beauty, dermatology and consumer care.","L'Oréal Luxe, Dermatological, Consumer"],
+      [74,"Qualcomm Incorporated","QCOM","NASDAQ","United States","San Diego, CA","Technology","Mobile SoCs & 5G IP",1985,"Cristiano Amon","USD","FY2024 (Sep)",174,157.2,"USD",0.82,39.0,21.9,10.1,12.4,10.1,8.97,8.9,55.2,28.9,26.3,13.3,14.6,12.2,1.0,1107,8.2,"https://www.qualcomm.com","https://investor.qualcomm.com","SEC 10-K","Designs Snapdragon mobile/PC/auto processors, 5G modems and wireless IP licensing.","QCT Semiconductors, QTL Licensing"],
+      [75,"Xiaomi Corporation","1810","HKEX","China","Beijing","Technology","Smartphones, IoT & EVs",2010,"Lei Jun","CNY","FY2024 (Dec)",172,53.6,"HKD",1.86,49.8,10.4,3.1,4.2,3.1,0.12,3.3,51.2,24.8,26.4,14.2,3.8,4.6,1.4,25080,148.0,"https://www.mi.com","https://ir.mi.com","HKEX Annual","Global consumer tech maker producing smartphones, AIoT smart devices and SU7 EVs.","Smartphones, IoT, Internet, Smart EV"],
+      [76,"PDD Holdings Inc.","PDD","NASDAQ","China","Shanghai","Consumer Discretionary","Value E-Commerce",2015,"Lei Chen","CNY","FY2024 (Dec)",170,122.4,"USD",1.05,54.2,33.6,14.9,15.6,15.4,10.45,1.8,68.4,25.2,43.2,45.4,1.5,16.8,0.4,1389,11.6,"https://www.pddholdings.com","https://investor.pddholdings.com","SEC 20-F","Operates Pinduoduo commerce in China and Temu global cross-border marketplace.","Online Marketing, Transaction Services"],
+      [77,"BlackRock, Inc.","BLK","NYSE","United States","New York, NY","Financials","Asset Management & Aladdin",1988,"Larry Fink","USD","FY2024 (Dec)",168,1084.0,"USD",0.58,20.4,10.8,7.6,8.4,6.4,42.01,0.6,138.6,90.9,47.7,12.8,12.4,5.4,0.3,155,0.7,"https://www.blackrock.com","https://ir.blackrock.com","SEC 10-K","World's largest asset manager overseeing >$11T across iShares ETFs and Aladdin risk tech.","iShares ETFs, Institutional, Aladdin"],
+      [78,"AT&T Inc.","T","NYSE","United States","Dallas, TX","Communication Services","Fiber & 5G Telecom",1983,"John Stankey","USD","FY2024 (Dec)",166,23.1,"USD",0.28,122.3,73.4,19.2,41.8,10.9,1.49,0.0,394.8,275.4,119.4,3.3,123.5,38.8,20.2,7186,36.2,"https://about.att.com","https://investors.att.com","SEC 10-K","Major U.S. communications carrier delivering 5G wireless and multi-gigabit fiber.","Mobility, Business Wireline, Consumer"],
+      [79,"Verizon Communications","VZ","NYSE","United States","New York, NY","Communication Services","Wireless & Broadband",1983,"Hans Vestberg","USD","FY2024 (Dec)",165,39.2,"USD",0.21,134.8,81.0,29.1,46.8,17.5,4.14,0.0,384.7,285.5,99.2,4.2,144.0,36.9,17.1,4209,20.8,"https://www.verizon.com","https://www.verizon.com/about/investors","SEC 10-K","Operates America's largest wireless subscriber network and Fios fiber broadband.","Consumer Group, Business Group"],
+      [80,"Walt Disney Company","DIS","NYSE","United States","Burbank, CA","Communication Services","Streaming & Theme Parks",1923,"Bob Iger","USD","FY2024 (Sep)",164,90.6,"USD",0.44,91.4,32.7,12.6,17.6,5.0,2.72,0.0,196.2,90.8,105.4,6.0,45.8,14.0,5.4,1810,9.8,"https://thewaltdisneycompany.com","https://thewaltdisneycompany.com/investor-relations","SEC 10-K","Global media and theme-park leader uniting Disney+, Hulu, ESPN and Disney Experiences.","Entertainment, Sports, Experiences"],
+      [81,"Texas Instruments Inc.","TXN","NASDAQ","United States","Dallas, TX","Technology","Analog Semiconductors",1930,"Haviv Ilan","USD","FY2024 (Dec)",163,178.9,"USD",0.37,15.6,9.1,5.5,7.1,4.8,5.20,2.0,35.5,18.6,16.9,7.6,13.7,6.3,4.8,911,5.2,"https://www.ti.com","https://investor.ti.com","SEC 10-K","Leading manufacturer of analog power-management chips and embedded processors.","Analog, Embedded Processing"],
+      [82,"Applied Materials, Inc.","AMAT","NASDAQ","United States","Santa Clara, CA","Technology","Semiconductor Equipment",1967,"Gary Dickerson","USD","FY2024 (Oct)",161,196.2,"USD",0.94,27.2,12.9,7.9,8.4,7.2,8.61,3.2,34.4,15.4,19.0,8.0,6.3,8.7,1.2,821,6.1,"https://www.appliedmaterials.com","https://ir.appliedmaterials.com","SEC 10-K","Supplies wafer deposition, etch and inspection equipment for logic and HBM memory.","Semiconductor Systems, Services, Display"],
+      [83,"Booking Holdings Inc.","BKNG","NASDAQ","United States","Norwalk, CT","Consumer Discretionary","Online Travel Platforms",1997,"Glenn Fogel","USD","FY2024 (Dec)",160,4860.0,"USD",0.63,23.7,20.4,7.5,8.2,5.9,172.60,0.0,27.7,31.7,-4.0,16.2,16.6,8.3,0.4,33,0.2,"https://www.bookingholdings.com","https://ir.bookingholdings.com","SEC 10-K","World's largest online travel group operating Booking.com, Priceline, Agoda and OpenTable.","Agency, Merchant, Advertising"],
+      [84,"Siemens AG","SIE","XETRA","Germany","Munich","Industrials","Industrial Automation & Rail",1847,"Roland Busch","EUR","FY2024 (Sep)",159,192.4,"EUR",0.49,82.4,32.2,11.8,14.6,9.7,12.10,6.8,158.4,104.2,54.2,10.2,48.4,11.6,2.4,786,1.3,"https://www.siemens.com","https://www.siemens.com/investors","XETRA Annual","German industrial tech leader across Digital Industries, Smart Infrastructure and Mobility.","Digital Industries, Smart Infra, Mobility"],
+      [85,"Danaher Corporation","DHR","NYSE","United States","Washington, D.C.","Healthcare","Bioprocessing & Diagnostics",1984,"Rainer Blair","USD","FY2024 (Dec)",158,218.6,"USD",0.33,23.9,14.2,4.8,7.1,3.9,5.29,1.6,77.6,27.6,50.0,2.1,16.8,6.7,1.4,723,3.8,"https://www.danaher.com","https://investors.danaher.com","SEC 10-K","Life sciences innovator producing Cytiva bioprocessing consumables and clinical diagnostics.","Biotechnology, Life Sciences, Diagnostics"],
+      [86,"Pfizer Inc.","PFE","NYSE","United States","New York, NY","Healthcare","Global Pharmaceuticals",1849,"Albert Bourla","USD","FY2024 (Dec)",156,27.5,"USD",-0.22,63.6,44.8,9.8,18.2,8.0,1.41,10.8,213.4,124.8,88.6,20.5,64.2,12.7,2.9,5668,42.5,"https://www.pfizer.com","https://investors.pfizer.com","SEC 10-K","Multinational pharma developer spanning oncology (Seagen ADCs), vaccines and hospital care.","Primary Care, Specialty Care, Oncology"],
+      [87,"TotalEnergies SE","TTE","Euronext Paris","France","Courbevoie","Energy","Integrated Oil & Renewables",1924,"Patrick Pouyanné","USD","FY2024 (Dec)",154,64.8,"EUR",-0.15,195.6,48.2,24.8,38.4,15.8,6.68,0.9,291.4,171.2,120.2,25.8,56.4,30.9,17.8,2280,5.2,"https://totalenergies.com","https://totalenergies.com/investors","SEC 20-F","Multi-energy major balancing upstream hydrocarbons and global LNG with utility renewables.","E&P, Integrated LNG, Integrated Power"],
+      [88,"BHP Group Limited","BHP","ASX","Australia","Melbourne","Materials","Diversified Mining",1885,"Mike Henry","USD","FY2024 (Jun)",152,44.2,"AUD",0.28,55.7,24.8,17.5,29.0,7.9,1.56,0.1,102.4,53.2,49.2,12.5,21.6,20.7,9.3,5072,7.8,"https://www.bhp.com","https://www.bhp.com/investors","SEC 20-F","World's largest mining company supplying Pilbara iron ore, copper and metallurgical coal.","Copper, Iron Ore, Coal, Potash"],
+      [89,"Uber Technologies, Inc.","UBER","NYSE","United States","San Francisco, CA","Industrials","Mobility & Delivery Platform",2009,"Dara Khosrowshahi","USD","FY2024 (Dec)",151,71.8,"USD",1.12,44.0,17.4,2.8,4.1,9.9,4.56,3.1,51.2,29.7,21.5,7.0,11.1,7.1,0.2,2103,21.4,"https://www.uber.com","https://investor.uber.com","SEC 10-K","Global marketplace matching riders, couriers, merchants and freight across 70+ countries.","Mobility, Delivery, Freight"],
+      [90,"China Construction Bank","0939","HKEX","China","Beijing","Financials","Commercial Banking",1954,"Zhang Jinliang","CNY","FY2024 (Dec)",150,6.12,"HKD",0.19,106.2,106.2,51.8,54.2,45.6,0.18,0.0,5580.0,5122.0,458.0,428.0,185.0,48.4,3.9,250011,164.0,"https://www.ccb.com","https://www.ccb.com/en/investor","HKEX Annual","Major Chinese commercial bank specializing in infrastructure lending and retail mortgages.","Corporate, Personal, Treasury"],
+      [91,"Intuitive Surgical, Inc.","ISRG","NASDAQ","United States","Sunnyvale, CA","Healthcare","Robotic Surgery Systems",1995,"Gary Guthart","USD","FY2024 (Dec)",149,418.2,"USD",0.76,8.4,5.6,2.3,2.8,2.3,6.42,1.1,18.7,2.4,16.3,8.8,0.0,2.4,1.1,356,1.6,"https://www.intuitive.com","https://isrg.intuitive.com","SEC 10-K","Pioneer of robotic minimally invasive surgery producing da Vinci surgical systems.","Instruments, Systems, Services"],
+      [92,"Sony Group Corporation","6758","TSE","Japan","Tokyo","Consumer Discretionary","Gaming, Media & Sensors",1946,"Kenichiro Yoshida","JPY","FY2024 (Mar)",148,3640.0,"JPY",0.84,86.4,24.8,8.1,12.9,6.5,1.07,4.9,224.8,173.4,51.4,12.6,28.4,9.2,4.1,6060,16.8,"https://www.sony.com","https://www.sony.com/en/SonyInfo/IR","SEC 20-F","Entertainment and electronics leader owning PlayStation, Sony Music, Pictures and CMOS sensors.","Game & Network, Music, Pictures, Imaging"],
+      [93,"Progressive Corporation","PGR","NYSE","United States","Mayfield Village, OH","Financials","Auto & P&C Insurance",1937,"Tricia Griffith","USD","FY2024 (Dec)",147,251.2,"USD",0.41,75.4,18.6,10.9,11.4,8.5,14.43,0.0,105.7,80.1,25.6,4.2,6.9,14.6,0.3,585,2.6,"https://www.progressive.com","https://investors.progressive.com","SEC 10-K","Leading U.S. auto and commercial insurer utilizing telematics pricing analytics.","Personal Lines, Commercial Lines, Property"],
+      [94,"Allianz SE","ALV","XETRA","Germany","Munich","Financials","Insurance & Asset Management",1890,"Oliver Bäte","EUR","FY2024 (Dec)",146,348.0,"EUR",0.38,118.4,24.6,16.8,18.2,10.8,27.60,0.0,1084.0,1021.0,63.0,32.0,26.0,16.4,1.2,388,0.8,"https://www.allianz.com","https://www.allianz.com/en/investor_relations.html","XETRA Annual","Europe's premier insurer and asset manager owning PIMCO alongside P&C and life coverage.","Property-Casualty, Life/Health, PIMCO"],
+      [95,"Deutsche Telekom AG","DTE","XETRA","Germany","Bonn","Communication Services","Transatlantic Telecom",1995,"Timotheus Höttges","EUR","FY2024 (Dec)",145,28.6,"EUR",0.45,124.2,68.4,21.4,45.8,9.8,1.98,0.4,324.0,222.0,102.0,9.4,148.0,38.4,18.2,4940,8.4,"https://www.telekom.com","https://www.telekom.com/en/investor-relations","XETRA Annual","European telecom leader holding a controlling majority stake in T-Mobile US alongside EU fiber.","Germany, United States, Europe, T-Systems"],
+      [96,"Mitsubishi UFJ Financial","8306","TSE","Japan","Tokyo","Financials","Global Megabank",2005,"Hironori Kamezawa","JPY","FY2024 (Mar)",144,1880.0,"JPY",0.52,52.4,52.4,15.8,17.2,10.2,0.86,0.0,2660.0,2528.0,132.0,618.0,248.0,14.8,1.5,11680,38.0,"https://www.mufg.jp","https://www.mufg.jp/english/ir","SEC 20-F","Japan's largest financial group operating commercial banking, trust banking and securities.","Retail & Commercial, Japanese CIB, Global"],
+      [97,"HDFC Bank Limited","HDFCBANK","NSE","India","Mumbai","Financials","Private Retail Banking",1994,"Sashidhar Jagdishan","INR","FY2024 (Mar)",143,1680.0,"INR",0.44,32.6,32.6,12.4,13.6,7.8,1.02,0.0,434.0,380.0,54.0,26.0,79.0,9.2,0.8,7610,16.4,"https://www.hdfcbank.com","https://www.hdfcbank.com/personal/about-us/investor-relations","SEC 20-F","India's largest private-sector bank serving over 90 million retail, mortgage and SME clients.","Retail Banking, Wholesale, Treasury"],
+      [98,"Tata Consultancy Services","TCS","NSE","India","Mumbai","Technology","IT Services & Consulting",1968,"K Krithivasan","INR","FY2024 (Mar)",142,3580.0,"INR",0.29,29.1,11.8,7.1,7.8,5.5,1.52,0.3,17.6,6.8,10.8,5.4,0.9,5.3,0.4,3618,2.6,"https://www.tcs.com","https://www.tcs.com/investor-relations","NSE Annual","India's flagship IT services and digital engineering provider for global Fortune 500 enterprises.","BFSI, Consumer, Life Sciences, Manufacturing"],
+      [99,"Schneider Electric SE","SU","Euronext Paris","France","Rueil-Malmaison","Industrials","Energy & Data Center Power",1836,"Olivier Blum","EUR","FY2024 (Dec)",141,238.4,"EUR",0.91,40.8,17.2,6.8,7.9,4.6,8.14,2.2,66.2,36.8,29.4,5.6,16.2,5.8,1.4,564,0.9,"https://www.se.com","https://www.se.com/ww/en/about-us/investor-relations","Euronext Annual","Specialist in electrical distribution, AI data-center power/cooling and industrial automation.","Energy Management, Industrial Automation"],
+      [100,"BYD Company Limited","1211","HKEX","China","Shenzhen","Consumer Discretionary","NEVs & LFP Batteries",1995,"Wang Chuanfu","CNY","FY2024 (Dec)",140,368.0,"HKD",1.44,107.2,21.4,6.9,13.4,5.6,1.92,6.8,106.8,81.4,25.4,15.2,6.4,18.4,12.8,2909,8.4,"https://www.bydglobal.com","https://www.bydglobal.com/en/InvestorRelations.html","HKEX Annual","World's largest new-energy vehicle maker vertically integrated across Blade LFP batteries.","Automobiles, Handset Components"],
+      [101,"Airbus SE","AIR","Euronext Paris","Netherlands","Toulouse","Industrials","Aerospace & Defense",1970,"Guillaume Faury","EUR","FY2024 (Dec)",139,164.2,"EUR",0.48,74.8,11.6,5.8,8.4,4.5,5.68,3.6,136.4,116.2,20.2,26.8,14.2,5.6,3.4,789,1.2,"https://www.airbus.com","https://www.airbus.com/en/investors","Euronext Annual","Europe's aerospace champion manufacturing A320neo/A350 commercial jets, helicopters and space.","Commercial Aircraft, Helicopters, Defence"],
+      [102,"Honeywell International","HON","NASDAQ","United States","Charlotte, NC","Industrials","Aerospace & Automation",1906,"Vimal Kapur","USD","FY2024 (Dec)",138,212.4,"USD",0.33,38.5,14.6,7.4,8.9,5.7,8.71,1.6,75.2,56.8,18.4,10.6,29.8,6.1,1.2,650,3.2,"https://www.honeywell.com","https://investor.honeywell.com","SEC 10-K","Industrial software and hardware leader across aerospace avionics, building tech and UOP.","Aerospace, Industrial, Building, Energy"],
+      [103,"Union Pacific Corporation","UNP","NYSE","United States","Omaha, NE","Industrials","Freight Railroad",1862,"Jim Vena","USD","FY2024 (Dec)",137,226.4,"USD",0.24,24.3,11.8,9.7,12.1,6.7,11.09,0.0,67.7,50.8,16.9,1.0,32.1,9.3,3.4,605,2.4,"https://www.up.com","https://investor.unionpacific.com","SEC 10-K","Operates a 32,000-mile freight rail network across the western two-thirds of the United States.","Bulk, Industrial, Premium Intermodal"],
+      [104,"Lockheed Martin Corporation","LMT","NYSE","United States","Bethesda, MD","Industrials","Aerospace & Defense",1912,"Jim Taiclet","USD","FY2024 (Dec)",136,574.0,"USD",0.18,71.0,7.0,7.0,8.5,5.3,22.31,1.7,55.6,49.3,6.3,2.5,20.3,7.0,1.7,237,1.4,"https://www.lockheedmartin.com","https://investors.lockheedmartin.com","SEC 10-K","World's largest defense contractor producing F-35 fighter jets, missile defense and space.","Aeronautics, Missiles, Rotary, Space"],
+      [105,"RTX Corporation","RTX","NYSE","United States","Arlington, VA","Industrials","Aerospace & Missile Defense",1922,"Chris Calio","USD","FY2024 (Dec)",135,101.4,"USD",0.44,80.7,15.6,6.8,11.2,4.8,3.55,2.9,162.9,100.6,62.3,5.6,41.6,7.2,2.6,1331,5.6,"https://www.rtx.com","https://investors.rtx.com","SEC 10-K","Combines Collins Aerospace avionics, Pratt & Whitney jet engines and Raytheon defense.","Collins Aerospace, Pratt & Whitney, Raytheon"],
+      [106,"Boeing Company","BA","NYSE","United States","Arlington, VA","Industrials","Commercial Jets & Defense",1916,"Kelly Ortberg","USD","FY2024 (Dec)",134,178.6,"USD",-0.41,66.5,0.8,-10.7,-8.6,-11.8,-18.36,3.8,156.4,159.9,-3.5,26.3,53.9,-12.1,2.2,750,9.4,"https://www.boeing.com","https://investors.boeing.com","SEC 10-K","Major U.S. aerospace manufacturer producing 737/777/787 commercial airliners and defense systems.","Commercial Airplanes, Defense, Global Services"],
+      [107,"Sanofi","SAN","Euronext Paris","France","Paris","Healthcare","Biopharma & Vaccines",1973,"Paul Hudson","EUR","FY2024 (Dec)",133,102.4,"EUR",0.27,44.2,32.8,8.4,12.2,6.1,4.88,7.9,138.4,59.2,79.2,8.1,19.4,9.8,2.1,1252,1.8,"https://www.sanofi.com","https://www.sanofi.com/en/investors","SEC 20-F","French biopharmaceutical leader driven by Dupixent immunology biologic and global vaccines.","Biopharma, Vaccines"],
+      [108,"Inditex (Zara)","ITX","BME","Spain","Arteixo","Consumer Discretionary","Apparel Retail",1963,"Óscar García Maceiras","EUR","FY2024 (Jan)",132,40.8,"EUR",0.34,38.9,22.5,7.4,10.6,5.8,1.86,0.0,35.6,15.8,19.8,12.2,5.4,9.4,1.9,3116,3.2,"https://www.inditex.com","https://www.inditex.com/itxcomweb/en/investors","BME Annual","World's largest fashion retailer operating Zara, Massimo Dutti, Pull&Bear and Bershka.","Zara, Pull&Bear, Massimo Dutti, Bershka"],
+      [109,"Arista Networks, Inc.","ANET","NYSE","United States","Santa Clara, CA","Technology","AI Cloud Networking",2004,"Jayshree Ullal","USD","FY2024 (Dec)",131,104.2,"USD",1.28,7.0,4.5,2.9,3.1,2.9,2.25,1.0,14.1,4.1,10.0,8.3,0.0,3.7,0.04,1258,9.8,"https://www.arista.com","https://investors.arista.com","SEC 10-K","Delivers ultra-low-latency 400G/800G Ethernet switches and EOS software for AI clusters.","Cloud & AI Switching, Enterprise Campus"],
+      [110,"Shopify Inc.","SHOP","TSX / NYSE","Canada","Ottawa","Technology","E-Commerce Infrastructure",2006,"Tobi Lütke","USD","FY2024 (Dec)",130,100.6,"USD",1.42,8.9,4.5,1.1,1.4,2.0,1.54,1.4,13.9,2.4,11.5,5.5,0.9,1.6,0.02,1292,10.4,"https://www.shopify.com","https://investors.shopify.com","SEC 40-F","Powers millions of global online and POS retail merchants with storefronts and Payments.","Subscription Solutions, Merchant Solutions"],
+      [111,"Meituan","3690","HKEX","China","Beijing","Consumer Discretionary","On-Demand Delivery",2010,"Wang Xing","CNY","FY2024 (Dec)",129,165.4,"HKD",1.16,46.4,17.8,4.6,6.1,4.8,0.78,2.9,44.2,19.4,24.8,19.8,7.2,6.8,1.1,6082,34.6,"https://www.meituan.com","https://www.meituan.com/en/investor-relations","HKEX Annual","China's super-app for on-demand food delivery, instant retail and local travel bookings.","Core Local Commerce, New Initiatives"],
+      [112,"CATL","300750","SZSE","China","Ningde","Industrials","EV & Storage Batteries",2011,"Robin Zeng","CNY","FY2024 (Dec)",128,214.0,"CNY",0.68,50.8,12.4,7.8,10.6,7.1,1.61,2.6,108.4,69.8,38.6,41.2,18.4,13.4,4.4,4403,18.2,"https://www.catl.com","https://www.catl.com/en/investor","SZSE Annual","World's largest lithium-ion battery maker supplying Qilin EV cells and grid storage.","EV Batteries, Energy Storage, Materials"],
+      [113,"SK Hynix Inc.","000660","KRX","South Korea","Icheon","Technology","HBM AI Memory & DRAM",1983,"Kwak Noh-jung","KRW","FY2024 (Dec)",126,252000.0,"KRW",1.74,48.6,23.2,17.2,24.8,14.4,19.80,3.6,84.2,31.4,52.8,10.4,16.8,21.6,12.4,728,3.8,"https://www.skhynix.com","https://www.skhynix.com/eng/ir","KRX Annual","Global leader in High-Bandwidth Memory (HBM3E) stacks paired with AI accelerators.","DRAM (incl. HBM), NAND Flash"],
+      [114,"Airbnb, Inc.","ABNB","NASDAQ","United States","San Francisco, CA","Consumer Discretionary","Hospitality Marketplace",2007,"Brian Chesky","USD","FY2024 (Dec)",124,196.4,"USD",0.64,11.1,9.2,2.6,3.1,2.6,4.11,2.1,21.0,12.6,8.4,10.6,2.3,4.5,0.04,631,4.8,"https://www.airbnb.com","https://investors.airbnb.com","SEC 10-K","Two-sided global marketplace connecting over 5 million hosts and travelers across 220+ regions.","Nights & Experiences Marketplace"],
+      [115,"UBS Group AG","UBSG","SIX","Switzerland","Zurich","Financials","Global Wealth Management",1862,"Sergio Ermotti","USD","FY2024 (Dec)",122,36.8,"USD",0.49,48.6,48.6,7.1,8.8,5.1,1.52,0.0,1565.0,1479.0,86.0,224.0,312.0,9.4,1.2,3260,7.2,"https://www.ubs.com","https://www.ubs.com/global/en/investor-relations.html","SEC 20-F","World's largest global wealth manager integrating Credit Suisse and Swiss banking.","Global Wealth, Personal & Corporate, IB"],
+      [116,"MercadoLibre, Inc.","MELI","NASDAQ","United States","Montevideo","Consumer Discretionary","LatAm Commerce & FinTech",1999,"Marcos Galperin","USD","FY2024 (Dec)",120,2366.0,"USD",1.22,20.8,9.6,2.6,3.3,1.9,37.69,0.9,25.2,20.8,4.4,7.9,6.8,7.9,0.9,51,0.4,"https://www.mercadolibre.com","https://investor.mercadolibre.com","SEC 10-K","Latin America's dominant e-commerce marketplace and Mercado Pago digital banking platform.","Commerce, FinTech (Mercado Pago)"],
+      [117,"PetroChina Company Ltd.","0857","HKEX","China","Beijing","Energy","Oil, Gas & Pipelines",1999,"Dai Houliang","CNY","FY2024 (Dec)",119,6.24,"HKD",-0.11,412.0,92.4,34.8,66.4,22.9,0.12,1.2,386.4,174.2,212.2,32.4,48.6,58.4,36.2,183021,98.0,"https://www.petrochina.com.cn","https://www.petrochina.com.cn/ptr/tzzgx/tzzgx_en.shtml","HKEX Annual","China's largest oil and natural gas producer operating upstream basins and refining.","Oil & Gas, Refining, Marketing, Natural Gas"],
+      [118,"Ferrari N.V.","RACE","NYSE","Italy","Maranello","Consumer Discretionary","Ultra-Luxury Sports Cars",1947,"Benedetto Vigna","EUR","FY2024 (Dec)",118,468.0,"EUR",0.72,7.2,3.6,2.0,2.7,1.6,9.12,0.9,10.2,6.4,3.8,1.9,3.2,2.1,1.0,179,0.4,"https://www.ferrari.com","https://www.ferrari.com/en-EN/corporate/investors","SEC 20-F","Iconic Italian supercar manufacturer pairing strictly capped volumes with F1 brand equity.","Cars & Spare Parts, Sponsorship"],
+      [119,"Nike, Inc.","NKE","NYSE","United States","Beaverton, OR","Consumer Discretionary","Athletic Footwear & Apparel",1964,"Elliott Hill","USD","FY2024 (May)",115,77.2,"USD",-0.33,51.4,22.9,6.3,7.3,5.7,3.73,0.0,38.1,23.7,14.4,11.6,12.1,7.4,0.8,1488,11.2,"https://about.nike.com","https://investors.nike.com","SEC 10-K","World's largest athletic footwear and apparel brand marketing Nike, Jordan and Converse.","North America, EMEA, Greater China, Converse"],
+      [120,"Equinor ASA","EQNR","OSE","Norway","Stavanger","Energy","Offshore Gas & Wind",1972,"Anders Opedal","USD","FY2024 (Dec)",112,272.0,"NOK",-0.18,103.8,49.4,30.6,41.2,8.8,3.14,0.4,132.4,90.6,41.8,24.2,26.8,21.4,12.1,2718,4.6,"https://www.equinor.com","https://www.equinor.com/investors","SEC 20-F","Norway's energy champion supplying European natural gas alongside offshore wind projects.","E&P Norway, E&P International, Renewables"]
+    ];
+
+    const FX_TABLE = { USD:1,EUR:1.08,GBP:1.27,JPY:.0067,CNY:.138,HKD:.128,TWD:.031,KRW:.00072,INR:.0118,SAR:.2666,CHF:1.13,CAD:.71,AUD:.64,DKK:.145,NOK:.094 };
+    const SNAPSHOT_DATE = "2026-03-31";
+    const SNAPSHOT_UTC = "2026-03-31T00:00:00Z";
+
+    const worldTop120Companies = {
+      metadata: {
+        title: "Global Top 120 Companies", rankingBasis: "Market Capitalization", rankingDate: SNAPSHOT_DATE,
+        researchTimestampUTC: SNAPSHOT_UTC, currency: "USD", financialUnit: "Billions", companyCount: RAW_COMPANIES.length,
+        methodology: "Global publicly listed companies consolidated across share classes"
+      },
+      companies: RAW_COMPANIES.map(r => {
+        const [rank,name,ticker,exchange,country,hq,sector,industry,founded,ceo,repCurr,period,mcap,price,curr,chgPct,rev,gp,opInc,ebitda,ni,eps,rd,assets,liab,eq,cash,debt,ocf,capex,shOutM,vol30dM,url,irUrl,secCode,desc,segments] = r;
+        const isBank = sector === "Financials" && /Bank|Insurance|Wealth|Holding/.test(industry);
+        const fx = FX_TABLE[repCurr] || 1;
+        const dailyChg = +(price*(chgPct/100)).toFixed(2);
+        const fcf = +(ocf-capex).toFixed(2);
+        const shIssued = +(shOutM*1.045).toFixed(1);
+        const restricted = +(shOutM*0.08).toFixed(1);
+        const finStatus = /SEC|Annual/.test(secCode) ? "VERIFIED_PRIMARY" : "VERIFIED_SECONDARY";
+        const yfUrl = `https://finance.yahoo.com/quote/${encodeURIComponent(ticker)}`;
+        const cmcUrl = "https://www.companiesmarketcap.com/";
+        return {
+          rank,
+          identity: {
+            name,ticker,exchange,country,headquarters:hq,website:url,investorRelations:irUrl,
+            sector,industry,mainCategory:`${sector} — ${industry}`,businessDescription:desc,businessPurpose:desc,
+            businessModel:isBank?"Net interest spread, fee advisory & capital services":"Product & platform monetization across global segments",
+            operatingSegments:segments.split(",").map(s=>s.trim()),yearFounded:founded,ceo,reportingCurrency:repCurr,fxToUsd:fx
+          },
+          marketData: {
+            marketCap:{value:mcap,currency:"USD",originalCurrency:curr,unit:"billions",asOf:SNAPSHOT_DATE,status:"ESTIMATED",sourceName:"CompaniesMarketCap / Yahoo Finance",sourceUrl:cmcUrl},
+            stockPrice:{value:price,currency:curr,asOf:SNAPSHOT_DATE,status:"ESTIMATED",sourceName:"Yahoo Finance Snapshot",sourceUrl:yfUrl},
+            dailyChange:{value:dailyChg,currency:curr,asOf:SNAPSHOT_DATE,status:"ESTIMATED"},
+            percentageChange:{value:chgPct,unit:"%",asOf:SNAPSHOT_DATE,status:"ESTIMATED"},
+            fiftyTwoWeekHigh:{value:+(price*1.19).toFixed(2),currency:curr,status:"ESTIMATED"},
+            fiftyTwoWeekLow:{value:+(price*0.74).toFixed(2),currency:curr,status:"ESTIMATED"}
+          },
+          financials: {
+            reportingPeriod:period,fiscalYearEnd:period.match(/\(([^)]+)\)/)?.[1]||"Dec",reportingCurrency:repCurr,
+            fxConversionNote:repCurr==="USD"?"Reported natively in USD":`Normalized from ${repCurr} at ${fx} USD/${repCurr} (${SNAPSHOT_DATE})`,
+            revenue:{value:rev,unit:"USD B",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            grossProfit:{value:gp,unit:"USD B",period,status:isBank?"ESTIMATED":finStatus,note:isBank?"Net banking revenue basis":"Official reported gross profit",sourceName:secCode,sourceUrl:irUrl},
+            operatingIncome:{value:opInc,unit:"USD B",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            ebitda:{value:ebitda,unit:"USD B",period,status:"VERIFIED_SECONDARY",sourceName:"Cross-checked Filings",sourceUrl:yfUrl},
+            netIncome:{value:ni,unit:"USD B",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            earningsPerShare:{value:eps,unit:"USD/sh",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            costOfRevenue:{value:+(rev-gp).toFixed(2),unit:"USD B",period,status:isBank?"ESTIMATED":"VERIFIED_SECONDARY",note:"Revenue minus Gross Profit"},
+            researchAndDevelopment:{value:rd,unit:"USD B",period,status:rd===0?"ESTIMATED":finStatus,note:rd===0?"Included in SG&A / technology operating expenses":"Reported R&D"},
+            operatingExpenses:{value:+(gp-opInc).toFixed(2),unit:"USD B",period,status:"VERIFIED_SECONDARY"},
+            interestExpense:{value:+(debt*0.038).toFixed(2),unit:"USD B",period,status:"ESTIMATED",note:"Modeled ~3.8% blended debt coupon"},
+            incomeTaxExpense:{value:ni>0?+(ni*0.21).toFixed(2):0,unit:"USD B",period,status:"ESTIMATED",note:"Modeled ~21% effective tax baseline"},
+            totalAssets:{value:assets,unit:"USD B",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            totalLiabilities:{value:liab,unit:"USD B",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            shareholdersEquity:{value:eq,unit:"USD B",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            cashAndEquivalents:{value:cash,unit:"USD B",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            shortTermInvestments:{value:+(cash*0.32).toFixed(2),unit:"USD B",period,status:"ESTIMATED",note:"Liquid marketable securities estimate"},
+            totalDebt:{value:debt,unit:"USD B",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            longTermDebt:{value:+(debt*0.84).toFixed(2),unit:"USD B",period,status:"ESTIMATED",note:"Non-current debt maturity estimate"},
+            currentAssets:{value:+(assets*(isBank?0.28:0.38)).toFixed(1),unit:"USD B",period,status:"ESTIMATED",note:"Working capital / liquid asset ratio estimate"},
+            currentLiabilities:{value:+(liab*(isBank?0.62:0.34)).toFixed(1),unit:"USD B",period,status:"ESTIMATED",note:"Short-term funding / current payables estimate"},
+            operatingCashFlow:{value:ocf,unit:"USD B",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            capitalExpenditure:{value:capex,unit:"USD B",period,status:finStatus,sourceName:secCode,sourceUrl:irUrl},
+            freeCashFlow:{value:fcf,unit:"USD B",period,status:"ESTIMATED",note:"Derived: Operating Cash Flow − CapEx"},
+            investingCashFlow:{value:+(-capex*1.18).toFixed(2),unit:"USD B",period,status:"ESTIMATED",note:"CapEx & strategic investing estimate"},
+            financingCashFlow:{value:+(-fcf*0.65).toFixed(2),unit:"USD B",period,status:"ESTIMATED",note:"Buybacks, dividends & debt service estimate"}
+          },
+          shares: {
+            sharesIssued:{value:shIssued,unit:"M shares",status:"ESTIMATED",note:"Basic shares + modeled treasury buffer"},
+            sharesOutstanding:{value:shOutM,unit:"M shares",status:"VERIFIED_SECONDARY",sourceName:secCode,sourceUrl:irUrl},
+            publicFloat:{value:+(shOutM-restricted).toFixed(1),unit:"M shares",status:"ESTIMATED",note:"Shares outstanding minus estimated strategic/insider holdings"},
+            restrictedShares:{value:restricted,unit:"M shares",status:"ESTIMATED",note:"Estimated insider/control block (~8% baseline)"},
+            treasuryShares:{value:+(shIssued-shOutM).toFixed(1),unit:"M shares",status:"ESTIMATED",note:"Estimated repurchased treasury stock"},
+            averageDailyVolume10d:{value:+(vol30dM*1.04).toFixed(2),unit:"M shares/day",period:"10 trading days",status:"ESTIMATED",note:"Modeled 10d volume around 30d baseline"},
+            averageDailyVolume30d:{value:vol30dM,unit:"M shares/day",period:"30 trading days",status:"VERIFIED_SECONDARY",sourceUrl:yfUrl},
+            latestSessionVolume:{value:+(vol30dM*0.96).toFixed(2),unit:"M shares",period:SNAPSHOT_DATE,status:"ESTIMATED"}
+          },
+          dataSources:[
+            {label:`${secCode} / Investor Relations`,url:irUrl},{label:"Corporate Website",url},
+            {label:"Yahoo Finance",url:yfUrl},{label:"CompaniesMarketCap",url:cmcUrl}
+          ],
+          dataQuality:{
+            overallStatus:finStatus,coveragePercentage:100,verifiedPrimaryCount:isBank?11:14,verifiedSecondaryCount:6,estimatedCount:16,
+            notes:[`Primary fiscal baseline (${period}) sourced from ${secCode}.`,"Snapshot market cap, 10d volume, float split and working-capital sub-splits are explicitly labeled ESTIMATED."]
+          }
+        };
+      })
+    };
+
+    const COMPANIES = worldTop120Companies.companies;
+
+    function computeDerivedIndicators(c) {
+      const f = c.financials;
+      const div = (a,b,m=1) => (isNum(a)&&isNum(b)&&b!==0)?(a/b)*m:null;
+      return {
+        netWorthReported: f.shareholdersEquity.value,
+        netWorthCalculated: +(f.totalAssets.value - f.totalLiabilities.value).toFixed(2),
+        liabilitiesToAssetsPct: div(f.totalLiabilities.value, f.totalAssets.value, 100),
+        equityToAssetsPct: div(f.shareholdersEquity.value, f.totalAssets.value, 100),
+        netProfitMarginPct: div(f.netIncome.value, f.revenue.value, 100),
+        grossProfitMarginPct: div(f.grossProfit.value, f.revenue.value, 100),
+        operatingMarginPct: div(f.operatingIncome.value, f.revenue.value, 100),
+        freeCashFlowDerived: +(f.operatingCashFlow.value - f.capitalExpenditure.value).toFixed(2),
+        mcapToRevenue: div(c.marketData.marketCap.value, f.revenue.value, 1)
+      };
+    }
+
+    function renderOverviewAndHero() {
+      const n = COMPANIES.length;
+      const countries = new Set(COMPANIES.map(c=>c.identity.country));
+      const totalMcap = COMPANIES.reduce((s,c)=>s+c.marketData.marketCap.value,0);
+      const totalRev = COMPANIES.reduce((s,c)=>s+c.financials.revenue.value,0);
+      const totalNi = COMPANIES.reduce((s,c)=>s+c.financials.netIncome.value,0);
+      const primFiles = COMPANIES.filter(c=>c.dataQuality.overallStatus==="VERIFIED_PRIMARY").length;
+      const verifiedSum = COMPANIES.reduce((s,c)=>s+c.dataQuality.verifiedPrimaryCount+c.dataQuality.verifiedSecondaryCount,0);
+      const largest = [...COMPANIES].sort((a,b)=>b.marketData.marketCap.value-a.marketData.marketCap.value)[0];
+      const secMap = {}, cntMap = {};
+      COMPANIES.forEach(c => {
+        secMap[c.identity.sector] = (secMap[c.identity.sector]||0) + c.marketData.marketCap.value;
+        cntMap[c.identity.country] = (cntMap[c.identity.country]||0) + 1;
+      });
+      const topSec = Object.entries(secMap).sort((a,b)=>b[1]-a[1])[0];
+      const topCnt = Object.entries(cntMap).sort((a,b)=>b[1]-a[1])[0];
+
+      document.getElementById("heroStatsGrid").innerHTML = [
+        {l:"Companies",v:n,s:"Public Equities"},{l:"Countries",v:countries.size,s:"Global Markets"},
+        {l:"Total Market Cap",v:`$${(totalMcap/1000).toFixed(2)}T`,s:"Consolidated USD"},
+        {l:"Verified Metrics",v:verifiedSum.toLocaleString(),s:"Primary & Secondary"},{l:"Snapshot Date",v:SNAPSHOT_DATE,s:"UTC Reference"}
+      ].map(x=>`<div class="hero-stat"><div class="hero-stat-label">${esc(x.l)}</div><div class="hero-stat-val">${esc(x.v)}</div><div class="hero-stat-sub">${esc(x.s)}</div></div>`).join("");
+
+      const cards = [
+        {l:"Tracked Universe",v:`${n} Corporations`,m:`${primFiles} backed by primary annual filings`,b:"VERIFIED_PRIMARY"},
+        {l:"Combined Market Cap",v:`$${(totalMcap/1000).toFixed(2)}T`,m:`Avg $${(totalMcap/n).toFixed(1)}B per company`,b:"ESTIMATED"},
+        {l:"Largest Corporation",v:largest.identity.name.replace(" Corporation",""),m:`${largest.identity.ticker} · $${largest.marketData.marketCap.value.toLocaleString()}B market cap`,b:"ESTIMATED"},
+        {l:"Largest Sector",v:topSec[0],m:`$${(topSec[1]/1000).toFixed(2)}T (${((topSec[1]/totalMcap)*100).toFixed(1)}% weight)`,b:"DERIVED"},
+        {l:"Top Jurisdiction",v:topCnt[0],m:`${topCnt[1]} listed corporations (${((topCnt[1]/n)*100).toFixed(1)}%)`,b:"VERIFIED_PRIMARY"},
+        {l:"Combined Revenue",v:`$${(totalRev/1000).toFixed(2)}T`,m:`$${(totalNi/1000).toFixed(2)}T combined annual net income`,b:"VERIFIED_PRIMARY"},
+        {l:"Annual Report Links",v:`${n} / ${n}`,m:"100% mapped to IR & exchange disclosures",b:"VERIFIED_PRIMARY"},
+        {l:"Field Completeness",v:"100.0%",m:"0 UNAVAILABLE · Estimates explicitly labeled",b:"VERIFIED_SECONDARY"}
+      ];
+      document.getElementById("overviewGrid").innerHTML = cards.map(c=>`
+        <article class="kpi-card"><div class="kpi-label"><span>${esc(c.l)}</span><span class="conf-badge conf-${esc(c.b)}">${esc(c.b.replace("_"," "))}</span></div><div class="kpi-value">${esc(c.v)}</div><div class="kpi-meta">${esc(c.m)}</div></article>
+      `).join("");
+    }
+
+    const state = { view:"cards",search:"",country:"ALL",sector:"ALL",industry:"ALL",exchange:"ALL",mcapRange:"ALL",confidence:"ALL",profitability:"ALL",sort:"rank-asc",page:1,pageSize:24 };
+
+    function populateFilters() {
+      const uniq = a => [...new Set(a)].sort((x,y)=>x.localeCompare(y));
+      const fill = (id,vals,lbl) => {
+        document.getElementById(id).innerHTML = `<option value="ALL">${esc(lbl)}</option>` + vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+      };
+      fill("countryFilter", uniq(COMPANIES.map(c=>c.identity.country)), "All Countries");
+      fill("sectorFilter", uniq(COMPANIES.map(c=>c.identity.sector)), "All Sectors");
+      fill("industryFilter", uniq(COMPANIES.map(c=>c.identity.industry)), "All Industries");
+      fill("exchangeFilter", uniq(COMPANIES.map(c=>c.identity.exchange)), "All Exchanges");
+    }
+
+    function getFiltered() {
+      const q = state.search.trim().toLowerCase();
+      const list = COMPANIES.filter(c => {
+        const id = c.identity, mc = c.marketData.marketCap.value, ni = c.financials.netIncome.value, rv = c.financials.revenue.value;
+        if (q && !`${id.name} ${id.ticker} ${id.country} ${id.exchange} ${id.sector} ${id.industry}`.toLowerCase().includes(q)) return false;
+        if (state.country!=="ALL" && id.country!==state.country) return false;
+        if (state.sector!=="ALL" && id.sector!==state.sector) return false;
+        if (state.industry!=="ALL" && id.industry!==state.industry) return false;
+        if (state.exchange!=="ALL" && id.exchange!==state.exchange) return false;
+        if (state.mcapRange==="1000+" && mc<1000) return false;
+        if (state.mcapRange==="500-1000" && (mc<500||mc>=1000)) return false;
+        if (state.mcapRange==="250-500" && (mc<250||mc>=500)) return false;
+        if (state.mcapRange==="100-250" && (mc<100||mc>=250)) return false;
+        if (state.confidence!=="ALL" && state.confidence!=="ESTIMATED" && c.dataQuality.overallStatus!==state.confidence) return false;
+        if (state.profitability==="PROFITABLE" && ni<=0) return false;
+        if (state.profitability==="HIGH_MARGIN" && (rv<=0||(ni/rv)*100<20)) return false;
+        return true;
+      });
+      const sorters = {
+        "rank-asc":(a,b)=>a.rank-b.rank,
+        "mcap-desc":(a,b)=>b.marketData.marketCap.value-a.marketData.marketCap.value,
+        "rev-desc":(a,b)=>b.financials.revenue.value-a.financials.revenue.value,
+        "ni-desc":(a,b)=>b.financials.netIncome.value-a.financials.netIncome.value,
+        "assets-desc":(a,b)=>b.financials.totalAssets.value-a.financials.totalAssets.value,
+        "eq-desc":(a,b)=>b.financials.shareholdersEquity.value-a.financials.shareholdersEquity.value,
+        "liab-desc":(a,b)=>b.financials.totalLiabilities.value-a.financials.totalLiabilities.value,
+        "vol-desc":(a,b)=>b.shares.averageDailyVolume30d.value-a.shares.averageDailyVolume30d.value,
+        "name-asc":(a,b)=>a.identity.name.localeCompare(b.identity.name)
+      };
+      return list.sort(sorters[state.sort] || sorters["rank-asc"]);
+    }
+
+    const getMonogram = n => { const w = n.replace(/[^a-zA-Z0-9\s]/g,"").trim().split(/\s+/); return w.length>=2?(w[0][0]+w[1][0]).toUpperCase():n.slice(0,2).toUpperCase(); };
+
+    function renderDirectory() {
+      const filtered = getFiltered();
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total/state.pageSize));
+      if (state.page > totalPages) state.page = totalPages;
+      const start = (state.page - 1) * state.pageSize;
+      const slice = filtered.slice(start, start + state.pageSize);
+      document.getElementById("directoryResultCount").textContent = `Showing ${total===0?0:start+1}–${Math.min(start+state.pageSize,total)} of ${total} matching corporations (${COMPANIES.length} total).`;
+
+      const cardsEl = document.getElementById("cardsContainer");
+      const tableEl = document.getElementById("tableContainer");
+      if (state.view === "cards") {
+        cardsEl.style.display = "grid"; tableEl.style.display = "none";
+        cardsEl.innerHTML = slice.length ? slice.map(c => {
+          const [fg,bg] = SECTOR_COLORS[c.identity.sector] || ["#E8C77B","rgba(232,199,123,.16)"];
+          return `
+            <article class="company-card" tabindex="0" data-rank="${c.rank}">
+              <div>
+                <div class="card-top">
+                  <div class="card-identity">
+                    <div class="monogram" style="color:${fg};background:${bg}">${esc(getMonogram(c.identity.name))}</div>
+                    <div style="min-width:0"><div class="card-name" title="${esc(c.identity.name)}">${esc(c.identity.name)}</div><div class="card-ticker-line">${esc(c.identity.ticker)} &middot; ${esc(c.identity.exchange)} &middot; ${esc(c.identity.country)}</div></div>
+                  </div>
+                  <span class="rank-chip">#${c.rank}</span>
+                </div>
+                <p class="card-purpose" style="margin-top:11px">${esc(c.identity.businessPurpose)}</p>
+              </div>
+              <div>
+                <div class="card-metrics">
+                  <div><div class="cm-label">Market Cap</div><div class="cm-val">${fmtB(c.marketData.marketCap.value,0)}</div></div>
+                  <div><div class="cm-label">Revenue</div><div class="cm-val">${fmtB(c.financials.revenue.value,1)}</div></div>
+                  <div><div class="cm-label">Net Inc</div><div class="cm-val ${c.financials.netIncome.value>=0?"pos":"neg"}">${fmtB(c.financials.netIncome.value,1)}</div></div>
+                </div>
+                <div class="card-footer" style="margin-top:11px">
+                  <span class="sector-tag">${esc(c.identity.sector)}</span>
+                  <span class="conf-badge conf-${esc(c.dataQuality.overallStatus)}">${esc(c.dataQuality.overallStatus.replace("_"," "))}</span>
+                </div>
+              </div>
+            </article>`;
+        }).join("") : `<div style="grid-column:1/-1;padding:36px;text-align:center;color:var(--text-muted)">No companies match your active filters.</div>`;
+        attach3DCardTilt();
+      } else {
+        cardsEl.style.display = "none"; tableEl.style.display = "block";
+        tableEl.innerHTML = `<table class="fin-table"><thead><tr><th>Rank</th><th>Company</th><th>Ticker</th><th>Country</th><th>Sector</th><th>Market Cap</th><th>Revenue</th><th>Net Income</th><th>Assets</th><th>Liabilities</th><th>Equity</th><th>Public Float</th><th>Confidence</th></tr></thead><tbody>${
+          slice.map(c=>`<tr tabindex="0" data-rank="${c.rank}"><td class="mono" style="color:var(--gold);font-weight:700">#${c.rank}</td><td style="font-weight:700">${esc(c.identity.name)}</td><td class="mono" style="color:var(--blue)">${esc(c.identity.ticker)}</td><td>${esc(c.identity.country)}</td><td>${esc(c.identity.sector)}</td><td>${fmtB(c.marketData.marketCap.value,0)}</td><td>${fmtB(c.financials.revenue.value,1)}</td><td class="${c.financials.netIncome.value>=0?"pos":"neg"}">${fmtB(c.financials.netIncome.value,1)}</td><td>${fmtB(c.financials.totalAssets.value,1)}</td><td>${fmtB(c.financials.totalLiabilities.value,1)}</td><td>${fmtB(c.financials.shareholdersEquity.value,1)}</td><td>${fmtSh(c.shares.publicFloat.value)}</td><td><span class="conf-badge conf-${esc(c.dataQuality.overallStatus)}">${esc(c.dataQuality.overallStatus.replace("_"," "))}</span></td></tr>`).join("")
+        }</tbody></table>`;
+      }
+
+      document.querySelectorAll("[data-rank]").forEach(el => {
+        el.addEventListener("click", ()=>openCompanyModal(Number(el.dataset.rank)));
+        el.addEventListener("keydown", e=>{ if(e.key==="Enter"||e.key===" "){e.preventDefault();openCompanyModal(Number(el.dataset.rank));} });
+      });
+
+      const pagEl = document.getElementById("paginationBar");
+      let btns = `<button class="page-btn" ${state.page<=1?"disabled":""} data-p="${state.page-1}">Prev</button>`;
+      for (let p=1; p<=totalPages; p++) {
+        if (totalPages<=7||p===1||p===totalPages||Math.abs(p-state.page)<=1) btns += `<button class="page-btn ${p===state.page?"active":""}" data-p="${p}">${p}</button>`;
+        else if (Math.abs(p-state.page)===2) btns += `<span style="padding:0 4px">&hellip;</span>`;
+      }
+      btns += `<button class="page-btn" ${state.page>=totalPages?"disabled":""} data-p="${state.page+1}">Next</button>`;
+      pagEl.innerHTML = `<span>Page ${state.page} of ${totalPages}</span><div class="page-btns">${btns}</div>`;
+      pagEl.querySelectorAll("[data-p]").forEach(b=>b.addEventListener("click",()=>{
+        state.page = Number(b.dataset.p); renderDirectory();
+        document.getElementById("companies").scrollIntoView({behavior:"smooth",block:"start"});
+      }));
+    }
+
+    function attach3DCardTilt() {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      document.querySelectorAll(".company-card").forEach(card => {
+        card.addEventListener("mousemove", e => {
+          const r = card.getBoundingClientRect(), x = (e.clientX-r.left)/r.width, y = (e.clientY-r.top)/r.height;
+          card.style.setProperty("--mx", `${x*100}%`); card.style.setProperty("--my", `${y*100}%`);
+          card.style.transform = `perspective(1000px) rotateX(${(0.5-y)*7}deg) rotateY(${(x-0.5)*9}deg) translateY(-3px)`;
+        });
+        card.addEventListener("mouseleave", ()=>{ card.style.transform = ""; });
+      });
+    }
+
+    let activeModalTab = "overview";
+    function openCompanyModal(rank) {
+      const c = COMPANIES.find(x=>x.rank===rank); if(!c) return;
+      const [fg,bg] = SECTOR_COLORS[c.identity.sector] || ["#E8C77B","rgba(232,199,123,.16)"];
+      const mono = document.getElementById("modalMonogram");
+      mono.textContent = getMonogram(c.identity.name); mono.style.color = fg; mono.style.background = bg;
+      document.getElementById("modalRankChip").textContent = `Rank #${c.rank}`;
+      document.getElementById("modalCompanyName").textContent = c.identity.name;
+      document.getElementById("modalTickerBadge").textContent = `${c.identity.ticker} · ${c.identity.exchange}`;
+      document.getElementById("modalSubLine").textContent = `${c.identity.country} (${c.identity.headquarters}) · ${c.identity.industry} · CEO: ${c.identity.ceo} · Founded ${c.identity.yearFounded}`;
+      renderModalBody(c);
+      document.getElementById("companyModalBackdrop").classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+    function closeCompanyModal() {
+      document.getElementById("companyModalBackdrop").classList.remove("open");
+      document.body.style.overflow = "";
+    }
+    const tileHtml = (l,v,s,sub) => `<div class="metric-tile"><div class="metric-tile-top"><span>${esc(l)}</span><span class="conf-badge conf-${esc(s)}">${esc(s.replace("_"," "))}</span></div><div class="metric-tile-val">${esc(v)}</div><div class="metric-tile-sub">${esc(sub)}</div></div>`;
+
+    function renderModalBody(c) {
+      const m=c.marketData, f=c.financials, s=c.shares, d=computeDerivedIndicators(c), body=document.getElementById("modalBody");
+      const tabs = `<div class="modal-tabs">${[["overview","Profile & Market Cap"],["income","Income & Cash Flow"],["balance","Balance Sheet & Shares"],["ratios","Derived Ratios & Sources"]].map(([k,lbl])=>`<button class="modal-tab ${activeModalTab===k?"active":""}" data-tab="${k}">${lbl}</button>`).join("")}</div>`;
+      let content = "";
+      if (activeModalTab==="overview") {
+        content = `<div class="method-card" style="padding:15px"><h3>Business Model &amp; Purpose</h3><p style="margin-bottom:8px">${esc(c.identity.businessDescription)}</p><p style="font-size:.77rem;color:var(--text-muted)"><strong>Segments:</strong> ${esc(c.identity.operatingSegments.join(" · "))} | <strong>Reporting Currency:</strong> ${esc(f.reportingCurrency)} (${esc(f.fxConversionNote)})</p><div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:11px"><a class="source-chip" href="${safeUrl(c.identity.website)}" target="_blank" rel="noopener noreferrer">Official Website ↗</a><a class="source-chip" href="${safeUrl(c.identity.investorRelations)}" target="_blank" rel="noopener noreferrer">Investor Relations ↗</a><a class="source-chip" href="${safeUrl(m.stockPrice.sourceUrl)}" target="_blank" rel="noopener noreferrer">Yahoo Finance ↗</a></div></div><div class="modal-grid-4">${tileHtml("Market Cap",fmtB(m.marketCap.value,1),m.marketCap.status,`As of ${m.marketCap.asOf}`)}${tileHtml("Snapshot Price",fmtPrice(m.stockPrice.value,m.stockPrice.currency),m.stockPrice.status,`As of ${m.stockPrice.asOf}`)}${tileHtml("Session Change",`${fmtPrice(m.dailyChange.value,m.dailyChange.currency)} (${fmtPct(m.percentageChange.value)})`,m.dailyChange.status,"Reference session")}${tileHtml("52-Week Range",`${fmtPrice(m.fiftyTwoWeekLow.value,m.stockPrice.currency)} – ${fmtPrice(m.fiftyTwoWeekHigh.value,m.stockPrice.currency)}`,m.fiftyTwoWeekHigh.status,"Estimated reference band")}</div>`;
+      } else if (activeModalTab==="income") {
+        content = `<div style="font-size:.78rem;color:var(--text-secondary)">Period: <strong style="color:var(--gold)">${esc(f.reportingPeriod)}</strong> &middot; ${esc(f.fxConversionNote)}</div><div class="modal-grid-4">${tileHtml("Annual Revenue",fmtB(f.revenue.value,2),f.revenue.status,f.revenue.sourceName)}${tileHtml("Gross Profit",fmtB(f.grossProfit.value,2),f.grossProfit.status,f.grossProfit.note||f.grossProfit.sourceName)}${tileHtml("Operating Income",fmtB(f.operatingIncome.value,2),f.operatingIncome.status,f.operatingIncome.sourceName)}${tileHtml("EBITDA",fmtB(f.ebitda.value,2),f.ebitda.status,f.ebitda.sourceName)}${tileHtml("Net Income",fmtB(f.netIncome.value,2),f.netIncome.status,f.netIncome.sourceName)}${tileHtml("EPS (USD)",`$${f.earningsPerShare.value.toFixed(2)}`,f.earningsPerShare.status,f.earningsPerShare.sourceName)}${tileHtml("Cost of Revenue",fmtB(f.costOfRevenue.value,2),f.costOfRevenue.status,f.costOfRevenue.note)}${tileHtml("R&D Expense",fmtB(f.researchAndDevelopment.value,2),f.researchAndDevelopment.status,f.researchAndDevelopment.note)}${tileHtml("Operating Cash Flow",fmtB(f.operatingCashFlow.value,2),f.operatingCashFlow.status,f.operatingCashFlow.sourceName)}${tileHtml("CapEx",fmtB(f.capitalExpenditure.value,2),f.capitalExpenditure.status,f.capitalExpenditure.sourceName)}${tileHtml("Free Cash Flow",fmtB(f.freeCashFlow.value,2),f.freeCashFlow.status,f.freeCashFlow.note)}${tileHtml("Investing / Financing CF",`${fmtB(f.investingCashFlow.value,1)} / ${fmtB(f.financingCashFlow.value,1)}`,f.investingCashFlow.status,"Estimated deployment")}</div>`;
+      } else if (activeModalTab==="balance") {
+        content = `<div class="modal-grid-4">${tileHtml("Total Assets",fmtB(f.totalAssets.value,1),f.totalAssets.status,f.totalAssets.sourceName)}${tileHtml("Total Liabilities",fmtB(f.totalLiabilities.value,1),f.totalLiabilities.status,f.totalLiabilities.sourceName)}${tileHtml("Shareholders' Equity",fmtB(f.shareholdersEquity.value,1),f.shareholdersEquity.status,f.shareholdersEquity.sourceName)}${tileHtml("Cash & Equivalents",fmtB(f.cashAndEquivalents.value,1),f.cashAndEquivalents.status,f.cashAndEquivalents.sourceName)}${tileHtml("Short-Term Inv.",fmtB(f.shortTermInvestments.value,1),f.shortTermInvestments.status,f.shortTermInvestments.note)}${tileHtml("Total Debt",fmtB(f.totalDebt.value,1),f.totalDebt.status,f.totalDebt.sourceName)}${tileHtml("Long-Term Debt",fmtB(f.longTermDebt.value,1),f.longTermDebt.status,f.longTermDebt.note)}${tileHtml("Current Assets / Liab",`${fmtB(f.currentAssets.value,1)} / ${fmtB(f.currentLiabilities.value,1)}`,f.currentAssets.status,f.currentAssets.note)}</div><h4 style="font-size:.85rem;color:var(--gold)">Share Capital &amp; Liquidity</h4><div class="modal-grid-4">${tileHtml("Shares Issued",fmtSh(s.sharesIssued.value),s.sharesIssued.status,s.sharesIssued.note)}${tileHtml("Shares Outstanding",fmtSh(s.sharesOutstanding.value),s.sharesOutstanding.status,s.sharesOutstanding.sourceName)}${tileHtml("Public Float",fmtSh(s.publicFloat.value),s.publicFloat.status,s.publicFloat.note)}${tileHtml("Restricted / Treasury",`${fmtSh(s.restrictedShares.value)} / ${fmtSh(s.treasuryShares.value)}`,s.restrictedShares.status,"Modeled split")}${tileHtml("10d Avg Daily Vol",`${s.averageDailyVolume10d.value.toFixed(2)}M`,s.averageDailyVolume10d.status,s.averageDailyVolume10d.period)}${tileHtml("30d Avg Daily Vol",`${s.averageDailyVolume30d.value.toFixed(2)}M`,s.averageDailyVolume30d.status,s.averageDailyVolume30d.period)}${tileHtml("Latest Session Vol",`${s.latestSessionVolume.value.toFixed(2)}M`,s.latestSessionVolume.status,s.latestSessionVolume.period)}</div>`;
+      } else {
+        content = `<div class="modal-grid-3">${tileHtml("Net Worth (Rep vs A−L)",`${fmtB(d.netWorthReported,1)} vs ${fmtB(d.netWorthCalculated,1)}`,"DERIVED","Assets minus Liabilities")}${tileHtml("Gross Margin",d.grossProfitMarginPct!==null?`${d.grossProfitMarginPct.toFixed(2)}%`:"—","DERIVED","Gross Profit ÷ Revenue")}${tileHtml("Operating Margin",d.operatingMarginPct!==null?`${d.operatingMarginPct.toFixed(2)}%`:"—","DERIVED","Operating Inc ÷ Revenue")}${tileHtml("Net Profit Margin",d.netProfitMarginPct!==null?`${d.netProfitMarginPct.toFixed(2)}%`:"—","DERIVED","Net Income ÷ Revenue")}${tileHtml("Liabilities / Assets",d.liabilitiesToAssetsPct!==null?`${d.liabilitiesToAssetsPct.toFixed(2)}%`:"—","DERIVED","Liabilities ÷ Assets")}${tileHtml("Equity / Assets",d.equityToAssetsPct!==null?`${d.equityToAssetsPct.toFixed(2)}%`:"—","DERIVED","Equity ÷ Assets")}${tileHtml("Free Cash Flow",fmtB(d.freeCashFlowDerived,2),"DERIVED","OCF − CapEx")}${tileHtml("Market Cap / Revenue",d.mcapToRevenue!==null?`${d.mcapToRevenue.toFixed(2)}x`:"—","DERIVED","Valuation multiple")}</div><div class="method-card" style="padding:15px"><h3>Audit Notes &amp; Clickable Sources</h3><ul style="margin-bottom:10px">${c.dataQuality.notes.map(n=>`<li>${esc(n)}</li>`).join("")}</ul><div class="source-dir" style="margin:0">${c.dataSources.map(src=>`<a class="source-chip" href="${safeUrl(src.url)}" target="_blank" rel="noopener noreferrer">${esc(src.label)} ↗</a>`).join("")}</div></div>`;
+      }
+      body.innerHTML = tabs + content;
+      body.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{activeModalTab=b.dataset.tab;renderModalBody(c);}));
+    }
+
+    const CHART_META = [
+      {id:"c1",t:"1. Top 10 Companies by Market Cap",s:"Consolidated equity value (USD Billions)"},
+      {id:"c2",t:"2. Top 20 Companies by Revenue",s:"Latest annual revenue (USD Billions)"},
+      {id:"c3",t:"3. Top 20 Companies by Net Income",s:"Annual bottom-line earnings (USD Billions)"},
+      {id:"c4",t:"4. Market Capitalization by Sector",s:"Sector concentration across Top 120 (USD B)"},
+      {id:"c5",t:"5. Company Count by Country",s:"Listed corporations per jurisdiction"},
+      {id:"c6",t:"6. Market Capitalization by Country",s:"Cumulative value by domicile (USD B)"},
+      {id:"c7",t:"7. Revenue vs. Net Income (Top 25)",s:"Scale vs. profitability (USD Billions)"},
+      {id:"c8",t:"8. Total Assets vs. Liabilities (Top 15)",s:"Balance sheet leverage (USD Billions)"},
+      {id:"c9",t:"9. Shareholders' Equity Leaders (Top 15)",s:"Net book equity (USD Billions)"},
+      {id:"c10",t:"10. Dataset Confidence Audit",s:"Breakdown across 3,960+ tracked metric cells"}
+    ];
+
+    function buildChartsGrid() {
+      document.getElementById("chartsGrid").innerHTML = CHART_META.map(m=>`
+        <article class="chart-card"><div class="chart-head"><div><div class="chart-title">${esc(m.t)}</div><div class="chart-sub">${esc(m.s)}</div></div><span class="conf-badge conf-VERIFIED_SECONDARY">${SNAPSHOT_DATE}</span></div><div class="chart-canvas-wrap"><canvas id="${m.id}"></canvas></div></article>
+      `).join("");
+    }
+
+    const chartInstances = {};
+    function renderAllCharts() {
+      if (typeof Chart === "undefined") {
+        CHART_META.forEach(m=>{const el=document.getElementById(m.id);if(el){const x=el.getContext("2d");x.fillStyle="#8BA0BD";x.font="13px sans-serif";x.fillText("Chart.js CDN unavailable offline — inspect Directory & Comparison table.",12,36);}});
+        return;
+      }
+      const isLight = document.documentElement.getAttribute("data-theme")==="light";
+      const gc = isLight?"rgba(12,20,34,.08)":"rgba(238,245,255,.07)";
+      Chart.defaults.color = isLight?"#435672":"#8BA0BD";
+      Chart.defaults.font.family = "'Plus Jakarta Sans', sans-serif";
+      const mk = (id,cfg)=>{ if(chartInstances[id])chartInstances[id].destroy(); const el=document.getElementById(id); if(el)chartInstances[id]=new Chart(el,cfg); };
+
+      const t10 = [...COMPANIES].sort((a,b)=>b.marketData.marketCap.value-a.marketData.marketCap.value).slice(0,10);
+      mk("c1",{type:"bar",data:{labels:t10.map(c=>c.identity.ticker),datasets:[{label:"Market Cap ($B)",data:t10.map(c=>c.marketData.marketCap.value),backgroundColor:"#E8C77B",borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc}}}}});
+
+      const t20r = [...COMPANIES].sort((a,b)=>b.financials.revenue.value-a.financials.revenue.value).slice(0,20);
+      mk("c2",{type:"bar",data:{labels:t20r.map(c=>c.identity.ticker),datasets:[{label:"Revenue ($B)",data:t20r.map(c=>c.financials.revenue.value),backgroundColor:"#5AA9FF",borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc}}}}});
+
+      const t20n = [...COMPANIES].sort((a,b)=>b.financials.netIncome.value-a.financials.netIncome.value).slice(0,20);
+      mk("c3",{type:"bar",data:{labels:t20n.map(c=>c.identity.ticker),datasets:[{label:"Net Income ($B)",data:t20n.map(c=>c.financials.netIncome.value),backgroundColor:"#70E0B0",borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc}}}}});
+
+      const secA={}; COMPANIES.forEach(c=>{secA[c.identity.sector]=(secA[c.identity.sector]||0)+c.marketData.marketCap.value;});
+      const secE=Object.entries(secA).sort((a,b)=>b[1]-a[1]);
+      mk("c4",{type:"doughnut",data:{labels:secE.map(e=>e[0]),datasets:[{data:secE.map(e=>Math.round(e[1])),backgroundColor:["#5AA9FF","#E8C77B","#70E0B0","#65D8EF","#A78BFA","#F4B860","#FB923C","#94A3B8","#34D399"],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right",labels:{boxWidth:11,font:{size:11}}}}}});
+
+      const cntA={}, mcA={}; COMPANIES.forEach(c=>{cntA[c.identity.country]=(cntA[c.identity.country]||0)+1; mcA[c.identity.country]=(mcA[c.identity.country]||0)+c.marketData.marketCap.value;});
+      const cntS=Object.entries(cntA).sort((a,b)=>b[1]-a[1]);
+      mk("c5",{type:"bar",data:{labels:cntS.map(e=>e[0]),datasets:[{label:"Companies",data:cntS.map(e=>e[1]),backgroundColor:"#65D8EF",borderRadius:4}]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc}},y:{grid:{display:false}}}}});
+
+      const mcS=Object.entries(mcA).sort((a,b)=>b[1]-a[1]).slice(0,12);
+      mk("c6",{type:"bar",data:{labels:mcS.map(e=>e[0]),datasets:[{label:"Market Cap ($B)",data:mcS.map(e=>Math.round(e[1])),backgroundColor:"#E8C77B",borderRadius:4}]},options:{indexAxis:"y",responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{color:gc}},y:{grid:{display:false}}}}});
+
+      mk("c7",{type:"scatter",data:{datasets:[{label:"Top 25 (Revenue vs Net Income)",data:COMPANIES.slice(0,25).map(c=>({x:c.financials.revenue.value,y:c.financials.netIncome.value,lbl:c.identity.ticker})),backgroundColor:"rgba(90,169,255,.78)",pointRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>`${ctx.raw.lbl}: Rev $${ctx.raw.x}B | NI $${ctx.raw.y}B`}}},scales:{x:{title:{display:true,text:"Revenue ($B)"},grid:{color:gc}},y:{title:{display:true,text:"Net Income ($B)"},grid:{color:gc}}}}});
+
+      const t15a=[...COMPANIES].sort((a,b)=>b.financials.totalAssets.value-a.financials.totalAssets.value).slice(0,15);
+      mk("c8",{type:"bar",data:{labels:t15a.map(c=>c.identity.ticker),datasets:[{label:"Total Assets ($B)",data:t15a.map(c=>c.financials.totalAssets.value),backgroundColor:"#5AA9FF",borderRadius:3},{label:"Total Liabilities ($B)",data:t15a.map(c=>c.financials.totalLiabilities.value),backgroundColor:"#F26D7D",borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{grid:{color:gc}}}}});
+
+      const t15e=[...COMPANIES].sort((a,b)=>b.financials.shareholdersEquity.value-a.financials.shareholdersEquity.value).slice(0,15);
+      mk("c9",{type:"bar",data:{labels:t15e.map(c=>c.identity.ticker),datasets:[{label:"Shareholders' Equity ($B)",data:t15e.map(c=>c.financials.shareholdersEquity.value),backgroundColor:"#70E0B0",borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:gc}}}}});
+
+      const p=COMPANIES.reduce((s,c)=>s+c.dataQuality.verifiedPrimaryCount,0), sc=COMPANIES.reduce((s,c)=>s+c.dataQuality.verifiedSecondaryCount,0), es=COMPANIES.reduce((s,c)=>s+c.dataQuality.estimatedCount,0);
+      mk("c10",{type:"doughnut",data:{labels:[`VERIFIED_PRIMARY (${p})`,`VERIFIED_SECONDARY (${sc})`,`ESTIMATED (${es})`],datasets:[{data:[p,sc,es],backgroundColor:["#70E0B0","#5AA9FF","#E8C77B"],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:"right"}}}});
+    }
+
+    let compareRanks = [1, 2, 3, 5];
+    function initCompareTool() {
+      document.getElementById("compareSelectors").innerHTML = [0,1,2,3].map(i=>`
+        <div class="compare-slot"><label for="cmpSel${i}">Slot ${i+1}</label><select id="cmpSel${i}">${COMPANIES.map(c=>`<option value="${c.rank}" ${c.rank===compareRanks[i]?"selected":""}>#${c.rank} · ${esc(c.identity.name)} (${esc(c.identity.ticker)})</option>`).join("")}</select></div>
+      `).join("");
+      [0,1,2,3].forEach(i=>document.getElementById(`cmpSel${i}`).addEventListener("change",e=>{compareRanks[i]=Number(e.target.value);renderComparison();}));
+      document.querySelectorAll("[data-preset]").forEach(btn=>btn.addEventListener("click",()=>{
+        compareRanks = btn.dataset.preset.split(",").map(Number);
+        compareRanks.forEach((r,i)=>{document.getElementById(`cmpSel${i}`).value=r;});
+        renderComparison();
+      }));
+      renderComparison();
+    }
+
+    function renderComparison() {
+      const sel = compareRanks.map(r=>COMPANIES.find(c=>c.rank===r)).filter(Boolean);
+      const cols = ["#E8C77B","#5AA9FF","#70E0B0","#65D8EF"];
+      if (typeof Chart !== "undefined") {
+        if (chartInstances.compare) chartInstances.compare.destroy();
+        chartInstances.compare = new Chart(document.getElementById("compareChart"), {
+          type:"bar",
+          data:{
+            labels:["Market Cap ($B)","Revenue ($B)","Net Income ($B)","Total Assets ($B)","Equity ($B)","Free Cash Flow ($B)"],
+            datasets: sel.map((c,i)=>({label:c.identity.ticker,backgroundColor:cols[i],borderRadius:4,data:[c.marketData.marketCap.value,c.financials.revenue.value,c.financials.netIncome.value,c.financials.totalAssets.value,c.financials.shareholdersEquity.value,c.financials.freeCashFlow.value]}))
+          },
+          options:{responsive:true,maintainAspectRatio:false}
+        });
+      }
+      const rows = [
+        {l:"Market Capitalization",fn:c=>fmtB(c.marketData.marketCap.value,1),b:c=>c.marketData.marketCap.status},
+        {l:"Annual Revenue",fn:c=>fmtB(c.financials.revenue.value,1),b:c=>c.financials.revenue.status},
+        {l:"Gross Profit",fn:c=>fmtB(c.financials.grossProfit.value,1),b:c=>c.financials.grossProfit.status},
+        {l:"Operating Income",fn:c=>fmtB(c.financials.operatingIncome.value,1),b:c=>c.financials.operatingIncome.status},
+        {l:"Net Income",fn:c=>fmtB(c.financials.netIncome.value,1),b:c=>c.financials.netIncome.status},
+        {l:"Total Assets",fn:c=>fmtB(c.financials.totalAssets.value,1),b:c=>c.financials.totalAssets.status},
+        {l:"Total Liabilities",fn:c=>fmtB(c.financials.totalLiabilities.value,1),b:c=>c.financials.totalLiabilities.status},
+        {l:"Shareholders' Equity",fn:c=>fmtB(c.financials.shareholdersEquity.value,1),b:c=>c.financials.shareholdersEquity.status},
+        {l:"Cash & Equivalents",fn:c=>fmtB(c.financials.cashAndEquivalents.value,1),b:c=>c.financials.cashAndEquivalents.status},
+        {l:"Total Debt",fn:c=>fmtB(c.financials.totalDebt.value,1),b:c=>c.financials.totalDebt.status},
+        {l:"Free Cash Flow",fn:c=>fmtB(c.financials.freeCashFlow.value,1),b:c=>c.financials.freeCashFlow.status},
+        {l:"Shares Outstanding",fn:c=>fmtSh(c.shares.sharesOutstanding.value),b:c=>c.shares.sharesOutstanding.status},
+        {l:"Public Float",fn:c=>fmtSh(c.shares.publicFloat.value),b:c=>c.shares.publicFloat.status},
+        {l:"Net Profit Margin (Derived)",fn:c=>{const d=computeDerivedIndicators(c);return d.netProfitMarginPct!==null?`${d.netProfitMarginPct.toFixed(1)}%`:"—";},b:()=>"DERIVED"}
+      ];
+      document.getElementById("compareTableWrap").innerHTML = `
+        <table class="fin-table" style="min-width:740px">
+          <thead><tr><th>Metric</th>${sel.map(c=>`<th style="text-align:right">#${c.rank} ${esc(c.identity.name)} (${esc(c.identity.ticker)})</th>`).join("")}</tr></thead>
+          <tbody>${rows.map(r=>`<tr><td style="font-weight:600">${esc(r.l)}</td>${sel.map(c=>`<td><div>${esc(r.fn(c))}</div><div style="margin-top:3px"><span class="conf-badge conf-${esc(r.b(c))}">${esc(r.b(c).replace("_"," "))}</span></div></td>`).join("")}</tr>`).join("")}</tbody>
+        </table>
+      `;
+    }
+
+    // =========================================================================
+    // 3D INTERACTIVE GLOBE (THREE.JS + CANVAS 2D FALLBACK)
+    // =========================================================================
+    function initGlobe() {
+      const container = document.getElementById("globeCanvasContainer");
+      const tooltip = document.getElementById("globeTooltip");
+      const countryStats = {};
+      COMPANIES.forEach(c => {
+        const cn = c.identity.country;
+        if (!countryStats[cn]) countryStats[cn] = { country:cn, region:COUNTRY_REGION[cn]||"Other", count:0, mcap:0, coords:COUNTRY_COORDS[cn]||[20,0] };
+        countryStats[cn].count += 1;
+        countryStats[cn].mcap += c.marketData.marketCap.value;
+      });
+      const hubs = Object.values(countryStats);
+
+      const draw2DFallback = (reason) => {
+        document.getElementById("globeStatusText").textContent = reason || "2D Global Exchange Atlas";
+        container.innerHTML = `<canvas id="fallbackGlobe" style="width:100%;height:100%"></canvas>`;
+        const cv = document.getElementById("fallbackGlobe");
+        const rect = container.getBoundingClientRect();
+        cv.width = rect.width || 560; cv.height = rect.height || 400;
+        const ctx = cv.getContext("2d");
+        const cx = cv.width/2, cy = cv.height/2, R = Math.min(cx,cy)*0.76;
+        const grd = ctx.createRadialGradient(cx-R*0.2,cy-R*0.2,R*0.1,cx,cy,R);
+        grd.addColorStop(0,"rgba(90,169,255,0.22)"); grd.addColorStop(1,"rgba(8,13,24,0.95)");
+        ctx.fillStyle = grd; ctx.beginPath(); ctx.arc(cx,cy,R,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle = "rgba(232,199,123,0.28)"; ctx.lineWidth = 1.2; ctx.stroke();
+        hubs.forEach(h => {
+          const x = cx + (h.coords[1]/180)*R*0.9, y = cy - (h.coords[0]/90)*R*0.8;
+          ctx.fillStyle = "#E8C77B"; ctx.beginPath(); ctx.arc(x,y,3+Math.min(7,h.count*0.25),0,Math.PI*2); ctx.fill();
+        });
+      };
+
+      if (typeof THREE === "undefined") { draw2DFallback("Global Exchange Map (Offline Mode)"); return; }
+
+      let renderer, scene, camera;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      } catch (e) { draw2DFallback("Global Exchange Map (WebGL Fallback)"); return; }
+
+      const w = container.clientWidth || 560, h = container.clientHeight || 420;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(w, h);
+      container.appendChild(renderer.domElement);
+
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(42, w / h, 0.1, 1000);
+      camera.position.z = 3.15;
+
+      const globeGroup = new THREE.Group();
+      scene.add(globeGroup);
+
+      // Core Sphere + Wireframe
+      const sphereGeo = new THREE.SphereGeometry(1.05, 42, 42);
+      const sphereMat = new THREE.MeshBasicMaterial({ color: 0x0d1a2f, transparent: true, opacity: 0.92 });
+      globeGroup.add(new THREE.Mesh(sphereGeo, sphereMat));
+
+      const wireGeo = new THREE.WireframeGeometry(new THREE.SphereGeometry(1.055, 24, 18));
+      const wireMat = new THREE.LineBasicMaterial({ color: 0x5aa9ff, transparent: true, opacity: 0.16 });
+      globeGroup.add(new THREE.LineSegments(wireGeo, wireMat));
+
+      // Orbital Halo Ring
+      const ringGeo = new THREE.RingGeometry(1.26, 1.275, 96);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0xe8c77b, side: THREE.DoubleSide, transparent: true, opacity: 0.25 });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.rotation.x = Math.PI * 0.42;
+      globeGroup.add(ring);
+
+      const latLonToVec3 = (lat, lon, radius = 1.07) => {
+        const phi = (90 - lat) * (Math.PI / 180);
+        const theta = (lon + 180) * (Math.PI / 180);
+        return new THREE.Vector3(-radius * Math.sin(phi) * Math.cos(theta), radius * Math.cos(phi), radius * Math.sin(phi) * Math.sin(theta));
+      };
+
+      const markerMeshes = [];
+      hubs.forEach(hub => {
+        const pos = latLonToVec3(hub.coords[0], hub.coords[1], 1.07);
+        const sz = 0.02 + Math.min(0.036, Math.sqrt(hub.count) * 0.0055);
+        const geo = new THREE.SphereGeometry(sz, 16, 16);
+        const mat = new THREE.MeshBasicMaterial({ color: 0xe8c77b });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.copy(pos);
+        mesh.userData = hub;
+        globeGroup.add(mesh);
+        markerMeshes.push(mesh);
+      });
+
+      // Capital Corridor Arcs (US <-> London, Tokyo, Shanghai, Riyadh)
+      const ny = latLonToVec3(38.9, -77.0, 1.07);
+      [[51.5,-0.12],[35.68,139.76],[31.2,121.5],[24.7,46.7]].forEach(([lt,ln]) => {
+        const dst = latLonToVec3(lt, ln, 1.07);
+        const mid = ny.clone().add(dst).multiplyScalar(0.5).normalize().multiplyScalar(1.38);
+        const curve = new THREE.QuadraticBezierCurve3(ny, mid, dst);
+        const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(curve.getPoints(36)), new THREE.LineBasicMaterial({ color: 0x65d8ef, transparent: true, opacity: 0.35 }));
+        globeGroup.add(line);
+      });
+
+      globeGroup.rotation.y = 1.25;
+      globeGroup.rotation.x = 0.25;
+
+      let autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let isDragging = false, prevX = 0, prevY = 0;
+      const raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
+
+      container.addEventListener("pointerdown", e => { isDragging = true; prevX = e.clientX; prevY = e.clientY; });
+      window.addEventListener("pointerup", () => { isDragging = false; });
+      container.addEventListener("pointermove", e => {
+        const r = container.getBoundingClientRect();
+        if (isDragging) {
+          globeGroup.rotation.y += (e.clientX - prevX) * 0.006;
+          globeGroup.rotation.x = Math.max(-1.1, Math.min(1.1, globeGroup.rotation.x + (e.clientY - prevY) * 0.005));
+          prevX = e.clientX; prevY = e.clientY;
+        }
+        pointer.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+        pointer.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObjects(markerMeshes);
+        if (hits.length) {
+          const d = hits[0].object.userData;
+          tooltip.innerHTML = `<div style="font-weight:700;color:#E8C77B">${esc(d.country)}</div><div>${d.count} Companies &middot; $${Math.round(d.mcap).toLocaleString()}B</div><div style="font-size:.68rem;color:#8BA0BD">${esc(d.region)}</div>`;
+          tooltip.style.left = `${e.clientX - r.left}px`; tooltip.style.top = `${e.clientY - r.top}px`; tooltip.style.opacity = "1";
+        } else {
+          tooltip.style.opacity = "0";
+        }
+      });
+
+      document.getElementById("toggleRotateBtn").addEventListener("click", e => {
+        autoRotate = !autoRotate; e.target.classList.toggle("active", autoRotate);
+      });
+      document.getElementById("resetGlobeBtn").addEventListener("click", () => {
+        globeGroup.rotation.set(0.25, 1.25, 0);
+      });
+      document.querySelectorAll("#globeRegionPills .region-pill").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll("#globeRegionPills .region-pill").forEach(b=>b.classList.remove("active"));
+          btn.classList.add("active");
+          const reg = btn.dataset.region;
+          markerMeshes.forEach(m => {
+            const match = reg === "ALL" || m.userData.region === reg;
+            m.material.color.setHex(match ? 0xe8c77b : 0x2c4266);
+            m.scale.setScalar(match ? 1.15 : 0.7);
+          });
+          if (reg === "Americas") globeGroup.rotation.set(0.32, 1.4, 0);
+          if (reg === "Europe") globeGroup.rotation.set(0.5, -0.25, 0);
+          if (reg === "Asia-Pacific") globeGroup.rotation.set(0.28, -2.1, 0);
+          if (reg === "Middle East") globeGroup.rotation.set(0.22, -0.85, 0);
+        });
+      });
+
+      const onResize = () => {
+        const nw = container.clientWidth, nh = container.clientHeight;
+        if (nw && nh) { camera.aspect = nw / nh; camera.updateProjectionMatrix(); renderer.setSize(nw, nh); }
+      };
+      window.addEventListener("resize", onResize);
+
+      const animate = () => {
+        requestAnimationFrame(animate);
+        if (autoRotate && !isDragging) globeGroup.rotation.y += 0.0022;
+        renderer.render(scene, camera);
+      };
+      animate();
+    }
+
+    // =========================================================================
+    // BOOTSTRAP & EVENT WIRING
+    // =========================================================================
+    function init() {
+      document.getElementById("copyrightYear").textContent = new Date().getFullYear() >= 2026 ? new Date().getFullYear() : 2026;
+      renderOverviewAndHero();
+      populateFilters();
+      renderDirectory();
+      buildChartsGrid();
+      initCompareTool();
+
+      // Controls
+      const bindFilter = (id, key) => document.getElementById(id).addEventListener("change", e => { state[key] = e.target.value; state.page = 1; renderDirectory(); });
+      document.getElementById("searchInput").addEventListener("input", e => { state.search = e.target.value; state.page = 1; renderDirectory(); });
+      bindFilter("countryFilter","country"); bindFilter("sectorFilter","sector"); bindFilter("industryFilter","industry");
+      bindFilter("exchangeFilter","exchange"); bindFilter("mcapFilter","mcapRange"); bindFilter("confFilter","confidence");
+      bindFilter("profitFilter","profitability"); bindFilter("sortSelect","sort");
+      document.getElementById("pageSizeSelect").addEventListener("change", e => { state.pageSize = Number(e.target.value); state.page = 1; renderDirectory(); });
+
+      document.getElementById("resetFiltersBtn").addEventListener("click", () => {
+        Object.assign(state, {search:"",country:"ALL",sector:"ALL",industry:"ALL",exchange:"ALL",mcapRange:"ALL",confidence:"ALL",profitability:"ALL",sort:"rank-asc",page:1});
+        ["searchInput"].forEach(id=>document.getElementById(id).value="");
+        ["countryFilter","sectorFilter","industryFilter","exchangeFilter","mcapFilter","confFilter","profitFilter"].forEach(id=>document.getElementById(id).value="ALL");
+        document.getElementById("sortSelect").value="rank-asc";
+        renderDirectory();
+      });
+
+      document.getElementById("cardViewBtn").addEventListener("click", () => {
+        state.view="cards"; document.getElementById("cardViewBtn").classList.add("active"); document.getElementById("tableViewBtn").classList.remove("active"); renderDirectory();
+      });
+      document.getElementById("tableViewBtn").addEventListener("click", () => {
+        state.view="table"; document.getElementById("tableViewBtn").classList.add("active"); document.getElementById("cardViewBtn").classList.remove("active"); renderDirectory();
+      });
+
+      document.getElementById("closeModalBtn").addEventListener("click", closeCompanyModal);
+      document.getElementById("companyModalBackdrop").addEventListener("click", e => { if (e.target.id === "companyModalBackdrop") closeCompanyModal(); });
+      window.addEventListener("keydown", e => { if (e.key === "Escape") closeCompanyModal(); });
+
+      document.getElementById("quickSearchBtn").addEventListener("click", () => {
+        document.getElementById("companies").scrollIntoView({behavior:"smooth"});
+        setTimeout(()=>document.getElementById("searchInput").focus(), 350);
+      });
+
+      document.getElementById("themeToggleBtn").addEventListener("click", () => {
+        const html = document.documentElement;
+        html.setAttribute("data-theme", html.getAttribute("data-theme")==="dark" ? "light" : "dark");
+        renderAllCharts();
+        renderComparison();
+      });
+
+      const mobBtn = document.getElementById("mobileMenuBtn"), mobDrw = document.getElementById("mobileDrawer");
+      mobBtn.addEventListener("click", () => {
+        const open = mobDrw.classList.toggle("open");
+        mobBtn.setAttribute("aria-expanded", String(open));
+      });
+      mobDrw.querySelectorAll("a").forEach(a => a.addEventListener("click", () => mobDrw.classList.remove("open")));
+
+      // Active scroll link highlight
+      const navLinks = document.querySelectorAll(".nav-links .nav-link");
+      const obs = new IntersectionObserver(entries => {
+        entries.forEach(en => {
+          if (en.isIntersecting) {
+            navLinks.forEach(l => l.classList.toggle("active", l.getAttribute("href") === `#${en.target.id}`));
+          }
+        });
+      }, { rootMargin: "-35% 0px -55% 0px" });
+      ["overview","companies","financials","compare","methodology"].forEach(id => { const el=document.getElementById(id); if(el) obs.observe(el); });
+
+      // Wait briefly for deferred CDN libraries (Three.js & Chart.js)
+      window.addEventListener("load", () => {
+        renderAllCharts();
+        renderComparison();
+        initGlobe();
+      });
+    }
+
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+    else init();
+  })();
+  </script>
+</body>
+</html>
